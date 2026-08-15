@@ -1,0 +1,5 @@
+.next
+node_modules
+data
+public/fonts
+next-env.d.ts

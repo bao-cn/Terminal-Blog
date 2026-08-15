@@ -1,0 +1,18 @@
+{
+  "blogName": "terminal.blog",
+  "contactEmail": "root@terminal.blog",
+  "description": "Field notes from the command line.",
+  "titleTemplate": "{BlogName} | {ArticleName}",
+  "favicon": "/favicon.svg",
+  "sourceFallback": "public.gateway",
+  "filings": {
+    "icp": "ICP备案号：待配置",
+    "police": "公安备案号：待配置"
+  },
+  "friendlyLinks": [
+    { "label": "Maple Font", "href": "https://github.com/subframe7536/Maple-font" },
+    { "label": "Next.js", "href": "https://nextjs.org" },
+    { "label": "React", "href": "https://react.dev" }
+  ],
+  "cookieNotice": "本站使用本地存储保存语言、主题和终端偏好。"
+}

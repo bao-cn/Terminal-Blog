@@ -1,0 +1,413 @@
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-ascii.woff2") format("woff2");
+  unicode-range: U+0000-00FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-latin-extended.woff2") format("woff2");
+  unicode-range: U+0100-024F, U+1E00-1EFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-symbols.woff2") format("woff2");
+  unicode-range: U+2000-27FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-punctuation.woff2") format("woff2");
+  unicode-range: U+3000-33FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-4e00-4fff.woff2") format("woff2");
+  unicode-range: U+4E00-4FFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-5000-51ff.woff2") format("woff2");
+  unicode-range: U+5000-51FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-5200-53ff.woff2") format("woff2");
+  unicode-range: U+5200-53FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-5400-55ff.woff2") format("woff2");
+  unicode-range: U+5400-55FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-5600-57ff.woff2") format("woff2");
+  unicode-range: U+5600-57FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-5800-59ff.woff2") format("woff2");
+  unicode-range: U+5800-59FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-5a00-5bff.woff2") format("woff2");
+  unicode-range: U+5A00-5BFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-5c00-5dff.woff2") format("woff2");
+  unicode-range: U+5C00-5DFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-5e00-5fff.woff2") format("woff2");
+  unicode-range: U+5E00-5FFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-6000-61ff.woff2") format("woff2");
+  unicode-range: U+6000-61FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-6200-63ff.woff2") format("woff2");
+  unicode-range: U+6200-63FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-6400-65ff.woff2") format("woff2");
+  unicode-range: U+6400-65FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-6600-67ff.woff2") format("woff2");
+  unicode-range: U+6600-67FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-6800-69ff.woff2") format("woff2");
+  unicode-range: U+6800-69FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-6a00-6bff.woff2") format("woff2");
+  unicode-range: U+6A00-6BFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-6c00-6dff.woff2") format("woff2");
+  unicode-range: U+6C00-6DFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-6e00-6fff.woff2") format("woff2");
+  unicode-range: U+6E00-6FFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-7000-71ff.woff2") format("woff2");
+  unicode-range: U+7000-71FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-7200-73ff.woff2") format("woff2");
+  unicode-range: U+7200-73FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-7400-75ff.woff2") format("woff2");
+  unicode-range: U+7400-75FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-7600-77ff.woff2") format("woff2");
+  unicode-range: U+7600-77FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-7800-79ff.woff2") format("woff2");
+  unicode-range: U+7800-79FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-7a00-7bff.woff2") format("woff2");
+  unicode-range: U+7A00-7BFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-7c00-7dff.woff2") format("woff2");
+  unicode-range: U+7C00-7DFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-7e00-7fff.woff2") format("woff2");
+  unicode-range: U+7E00-7FFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-8000-81ff.woff2") format("woff2");
+  unicode-range: U+8000-81FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-8200-83ff.woff2") format("woff2");
+  unicode-range: U+8200-83FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-8400-85ff.woff2") format("woff2");
+  unicode-range: U+8400-85FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-8600-87ff.woff2") format("woff2");
+  unicode-range: U+8600-87FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-8800-89ff.woff2") format("woff2");
+  unicode-range: U+8800-89FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-8a00-8bff.woff2") format("woff2");
+  unicode-range: U+8A00-8BFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-8c00-8dff.woff2") format("woff2");
+  unicode-range: U+8C00-8DFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-8e00-8fff.woff2") format("woff2");
+  unicode-range: U+8E00-8FFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-9000-91ff.woff2") format("woff2");
+  unicode-range: U+9000-91FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-9200-93ff.woff2") format("woff2");
+  unicode-range: U+9200-93FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-9400-95ff.woff2") format("woff2");
+  unicode-range: U+9400-95FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-9600-97ff.woff2") format("woff2");
+  unicode-range: U+9600-97FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-9800-99ff.woff2") format("woff2");
+  unicode-range: U+9800-99FF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-9a00-9bff.woff2") format("woff2");
+  unicode-range: U+9A00-9BFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-9c00-9dff.woff2") format("woff2");
+  unicode-range: U+9C00-9DFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-cjk-9e00-9fff.woff2") format("woff2");
+  unicode-range: U+9E00-9FFF;
+}
+
+@font-face {
+  font-family: "Maple Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/fonts/maple-mono/maple-mono-fullwidth.woff2") format("woff2");
+  unicode-range: U+FF00-FFEF;
+}

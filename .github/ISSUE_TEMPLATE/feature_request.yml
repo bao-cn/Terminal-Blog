@@ -1,0 +1,71 @@
+name: Feature request
+description: Propose a command, terminal workflow, or project capability
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Terminal Blog models features as terminal commands, files, and composable text streams. Explain the user problem first, then show how the proposal should behave in that model.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Use case or problem
+      description: Who needs this, what are they trying to accomplish, and why are current commands insufficient?
+      placeholder: As a visitor or administrator, I need ... because ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the complete interaction and resulting output or state changes.
+    validations:
+      required: true
+
+  - type: textarea
+    id: terminal-semantics
+    attributes:
+      label: Terminal semantics
+      description: Show proposed commands, arguments, options, paths, completion behavior, help text, exit behavior, and pipe compatibility.
+      placeholder: |
+        command [option] <required>
+
+        guest@terminal.blog:~ $ command ...
+        expected output
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe existing commands, workarounds, or simpler designs you evaluated.
+    validations:
+      required: true
+
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility and impact
+      description: Note effects on guest/root permissions, files, SQLite data, APIs, localization, themes, keyboard use, virtual scrolling, or existing command syntax.
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: References or examples
+      description: Add screenshots, recordings, standards, or comparable terminal tools if they clarify the proposal.
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Submission checklist
+      options:
+        - label: I searched existing Issues and Pull Requests for similar proposals.
+          required: true
+        - label: This request describes a concrete user workflow rather than only a visual preference.
+          required: true
+        - label: I removed credentials, tokens, private content, and other sensitive data.
+          required: true

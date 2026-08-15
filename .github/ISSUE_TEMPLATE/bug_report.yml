@@ -1,0 +1,121 @@
+name: Bug report
+description: Report a reproducible problem in Terminal Blog
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem. Search existing Issues first and remove passwords, tokens, private articles, IP addresses, and other sensitive data from every field and attachment.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Problem summary
+      description: Describe the failure and its impact in a few sentences.
+      placeholder: The terminal does ... when ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Terminal input, prompt, or scrollback
+        - Command parsing, completion, or pipelines
+        - Article discovery or Markdown rendering
+        - Nano, less, or alternate-screen behavior
+        - Authentication, sudo, or root sessions
+        - Drafts, uploads, or filesystem operations
+        - Drawer, theme, language, or responsive layout
+        - Installation, build, or deployment
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include the exact commands, paths, content, and actions needed to reproduce the problem.
+      placeholder: |
+        1. Start the application with ...
+        2. Enter `...`
+        3. Press ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: Describe the terminal output or behavior you expected.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: Describe what happened instead, including exact error text where possible.
+    validations:
+      required: true
+
+  - type: input
+    id: revision
+    attributes:
+      label: Terminal Blog revision
+      description: Provide a release, commit SHA, branch name, or Docker image tag.
+      placeholder: main at abc1234
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: Include the browser name, version, and rendering engine when known.
+      placeholder: Chrome 140 / Blink
+    validations:
+      required: true
+
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+      placeholder: Windows 11 24H2, macOS 16, or Ubuntu 26.04
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      description: Run `node --version` in the environment hosting Terminal Blog.
+      placeholder: v24.x.x
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or terminal output
+      description: Paste a minimal log excerpt after removing credentials, tokens, private content, and identifying data.
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or recordings
+      description: Attach visual evidence when the problem concerns layout, selection, cursor placement, rendering, or scrolling.
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Submission checklist
+      options:
+        - label: I searched existing Issues and Pull Requests for this problem.
+          required: true
+        - label: I reproduced the problem on the latest available revision.
+          required: true
+        - label: I removed passwords, tokens, private content, IP addresses, and other sensitive data.
+          required: true

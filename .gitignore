@@ -1,0 +1,63 @@
+# Local environment and secrets
+.env*
+!.env.example
+
+# Runtime content and persistence
+/articles/
+/data/
+/draft/*
+!/draft/.gitkeep
+/access/*
+!/access/.gitkeep
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+*.db
+*.db-wal
+*.db-shm
+
+# Dependencies, builds, caches, and test output
+/node_modules/
+/.next/
+/out/
+/dist/
+/.npm-cache/
+/.turbo/
+/.vercel/
+/coverage/
+.eslintcache
+*.tsbuildinfo
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Local editor and operating-system files
+/.vscode/
+/.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local agent instructions and state
+AGENTS.md
+AGENT.md
+Agents.md
+Agent.md
+agents.md
+agent.md
+CLAUDE.md
+Claude.md
+claude.md
+GEMINI.md
+Gemini.md
+gemini.md
+/.codex/
+/.claude/
