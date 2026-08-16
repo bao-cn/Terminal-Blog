@@ -227,7 +227,7 @@ export const commandRegistry: readonly CommandDefinition[] = [
     command: "nano",
     description: "在终端中创建或编辑文章",
     descriptionEn: "Create or edit an article inside the terminal",
-    arguments: [{ name: "article|./system/config", description: "文件", descriptionEn: "file", optional: true }],
+    arguments: [{ name: "article|config", description: "文件", descriptionEn: "file", optional: true }],
     rootOnly: true,
   },
   {
