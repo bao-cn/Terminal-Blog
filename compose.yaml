@@ -1,0 +1,21 @@
+services:
+  terminal-blog:
+    build:
+      context: .
+      target: runner
+    environment:
+      TERMINAL_ROOT_PASSWORD: ${TERMINAL_ROOT_PASSWORD:?Set TERMINAL_ROOT_PASSWORD before starting the container}
+    ports:
+      - "${TERMINAL_BLOG_PORT:-3000}:3000"
+    volumes:
+      - terminal-blog-articles:/app/articles
+      - terminal-blog-drafts:/app/draft
+      - terminal-blog-access:/app/access
+      - terminal-blog-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  terminal-blog-articles:
+  terminal-blog-drafts:
+  terminal-blog-access:
+  terminal-blog-data:
