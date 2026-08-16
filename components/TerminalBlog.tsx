@@ -43,6 +43,13 @@ import {
   type CommandDefinition,
 } from "@/lib/command-registry";
 import { defaultSiteConfig, type SiteConfig } from "@/lib/site-config";
+import {
+  COOKIE_CONSENT_STORAGE_KEY,
+  isCookieConsentCancelShortcut,
+  parseCookieConsentInput,
+  parseStoredCookieConsent,
+  type CookieConsent,
+} from "@/lib/cookie-consent";
 import { parseFrontmatter, serializeArticleDocument } from "@/lib/article-codec";
 import { splitCommand, splitPipeline } from "@/lib/terminal-command-parser";
 import { runTextPipeline, runTextStage } from "@/lib/terminal-text-pipeline";
@@ -86,6 +93,7 @@ const uiText = {
     editorSummary: "摘要",
     editorBody: "正文",
     writeFile: "写入文件",
+    cookieConsentInput: "y / n",
     placeholder: "输入 help 命令获取帮助，输入 / 打开命令菜单。",
   },
   en: {
@@ -121,6 +129,7 @@ const uiText = {
     editorSummary: "SUMMARY",
     editorBody: "TRANSMISSION BODY",
     writeFile: "WRITE FILE",
+    cookieConsentInput: "y / n",
     placeholder: "Enter the 'help' command to get helps, enter '/' to invoke the command menu.",
   },
 };
@@ -298,6 +307,7 @@ export default function TerminalBlog({
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [suggestionIndex, setSuggestionIndex] = useState(-1);
   const [pendingPassword, setPendingPassword] = useState<PasswordMode | null>(null);
+  const [cookiePromptPending, setCookiePromptPending] = useState(false);
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [pager, setPager] = useState<PagerState | null>(null);
   const [categorySlugs, setCategorySlugs] = useState(
@@ -320,6 +330,7 @@ export default function TerminalBlog({
   const scrollbackPositionRef = useRef(0);
   const restoreScrollbackRef = useRef(false);
   const stagedFilesRef = useRef(new Map<string, File>());
+  const cookiePromptShownRef = useRef(false);
   const nextId = useRef(1);
   const getEntryKey = useCallback((index: number) => entries[index]?.id ?? index, [entries]);
   // TanStack Virtual owns the measurement lifecycle for variable-height terminal entries.
@@ -338,6 +349,14 @@ export default function TerminalBlog({
   const copy = uiText[language];
   const resolvedTheme = themeMode === "auto" ? systemTheme : themeMode;
   const say = (zh: string, en: string) => (language === "en" ? en : zh);
+  const cookieNoticePrompt = [
+    siteConfig.cookieNotice.message,
+    language === "en"
+      ? "Accept this storage policy? Enter y/n, or press Ctrl+C to decline and stop future prompts."
+      : "是否同意此存储策略？请输入 y/n，或按 Ctrl+C 拒绝并停止后续提示。",
+  ]
+    .filter(Boolean)
+    .join("\n");
   const categories = useMemo<BlogCategory[]>(
     () =>
       categorySlugs.map((slug) => {
@@ -425,6 +444,31 @@ export default function TerminalBlog({
   }, [language, themeMode, hydrated]);
 
   useEffect(() => {
+    if (!hydrated) return;
+    if (!siteConfig.cookieNotice.enable) {
+      cookiePromptShownRef.current = false;
+      setCookiePromptPending(false);
+      return;
+    }
+    if (cookiePromptShownRef.current) return;
+    cookiePromptShownRef.current = true;
+    try {
+      if (parseStoredCookieConsent(window.localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY))) return;
+    } catch {
+      // The prompt still works for this session when storage is unavailable.
+    }
+    setEntries((previous) => [
+      ...previous,
+      {
+        id: `entry-${nextId.current++}`,
+        type: "text",
+        value: cookieNoticePrompt,
+      },
+    ]);
+    setCookiePromptPending(true);
+  }, [cookieNoticePrompt, hydrated, siteConfig.cookieNotice.enable]);
+
+  useEffect(() => {
     document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
     document.documentElement.style.colorScheme = resolvedTheme;
     document.body.style.background = resolvedTheme === "light" ? "#ffffff" : "#000000";
@@ -487,6 +531,21 @@ export default function TerminalBlog({
   });
 
   const append = (...newEntries: Entry[]) => setEntries((previous) => [...previous, ...newEntries]);
+
+  const completeCookieConsent = (consent: CookieConsent, interrupted = false) => {
+    try {
+      window.localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, consent);
+    } catch {
+      // The choice remains effective for this mounted session.
+    }
+    setCookiePromptPending(false);
+    setInput("");
+    const message =
+      consent === "accepted"
+        ? say("已记录同意。", "Consent recorded.")
+        : say("已记录拒绝，不再显示此提示。", "Declined. This notice will not be shown again.");
+    append(makeEntry(consent === "accepted" ? "success" : "text", { value: interrupted ? `^C\n${message}` : message }));
+  };
 
   const captureScrollback = () => {
     scrollbackPositionRef.current = outputRef.current?.scrollTop || 0;
@@ -635,11 +694,22 @@ export default function TerminalBlog({
 
   const executeCommand = (rawValue: string, options: ExecutionOptions = {}) => {
     const submitted = rawValue.trim();
-    if (!submitted && !pendingPassword) return;
+    if (!submitted && !pendingPassword && !cookiePromptPending) return;
     const effectiveUser = options.effectiveUser || user;
     const shouldEchoCommand = options.echoCommand !== false;
     const shouldRecordHistory = options.recordHistory !== false;
     playTick();
+
+    if (cookiePromptPending && !options.skipPasswordMode) {
+      const consent = parseCookieConsentInput(rawValue);
+      setInput("");
+      if (!consent) {
+        append(makeEntry("error", { value: say("请输入 y 或 n。", "Enter y or n.") }));
+      } else {
+        completeCookieConsent(consent);
+      }
+      return;
+    }
 
     if (pendingPassword && !options.skipPasswordMode) {
       setInput("");
@@ -1489,6 +1559,7 @@ export default function TerminalBlog({
   const hasExactCommand = candidateCommands.some((item) => item.command === commandToken);
   const paletteItems =
     !pendingPassword &&
+    !cookiePromptPending &&
     commandOnly &&
     (input.startsWith("/") || commandToken.length > 0) &&
     (!hasExactCommand || candidateCommands.length > 1)
@@ -1512,7 +1583,7 @@ export default function TerminalBlog({
 
   useEffect(() => {
     setSuggestionIndex(-1);
-  }, [input, pendingPassword, user]);
+  }, [cookiePromptPending, input, pendingPassword, user]);
 
   const acceptSuggestion = (item?: CommandDefinition) => {
     if (!item) return;
@@ -1565,7 +1636,7 @@ export default function TerminalBlog({
   };
 
   const clearTerminal = () => {
-    setEntries([makeEntry("boot")]);
+    setEntries([makeEntry("boot"), ...(cookiePromptPending ? [makeEntry("text", { value: cookieNoticePrompt })] : [])]);
     setPendingPassword(null);
     stagedFilesRef.current.clear();
   };
@@ -1599,6 +1670,9 @@ export default function TerminalBlog({
     }
     if (event.ctrlKey && !event.shiftKey && ["c", "v"].includes(event.key.toLowerCase())) {
       event.preventDefault();
+      if (cookiePromptPending && isCookieConsentCancelShortcut(event.key, event.ctrlKey, event.shiftKey)) {
+        completeCookieConsent("declined", true);
+      }
       return;
     }
     if (!insertMode && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
@@ -1850,7 +1924,7 @@ export default function TerminalBlog({
                   </div>
                   <div className="command-area">
                     <form
-                      className={`terminal-input ${pendingPassword ? "password-mode" : ""} ${insertMode ? "insert-mode" : "overwrite-mode"}`}
+                      className={`terminal-input ${pendingPassword ? "password-mode" : ""} ${cookiePromptPending ? "cookie-consent-mode" : ""} ${insertMode ? "insert-mode" : "overwrite-mode"}`}
                       onSubmit={(event) => {
                         event.preventDefault();
                         executeCommand(input);
@@ -1874,8 +1948,12 @@ export default function TerminalBlog({
                           autoComplete="off"
                           autoCapitalize="off"
                           spellCheck="false"
-                          aria-label={pendingPassword ? "Password" : "Terminal command"}
-                          placeholder={pendingPassword ? "" : copy.placeholder}
+                          aria-label={
+                            pendingPassword ? "Password" : cookiePromptPending ? "Cookie consent" : "Terminal command"
+                          }
+                          placeholder={
+                            pendingPassword ? "" : cookiePromptPending ? copy.cookieConsentInput : copy.placeholder
+                          }
                           autoFocus
                         />
                         <span
@@ -1912,7 +1990,7 @@ export default function TerminalBlog({
                         ))}
                       </div>
                     )}
-                    {paletteItems.length === 0 && input && activeReference && (
+                    {paletteItems.length === 0 && !cookiePromptPending && input && activeReference && (
                       <div className="argument-hint">
                         <span>{copy.usage}</span>
                         <code>{activeReference.syntax}</code>
