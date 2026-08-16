@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Short `config` virtual path for editing site configuration from the terminal.
 - Configurable first-visit cookie and local-storage consent prompt with persistent `y`, `n`, and `Ctrl+C` handling.
 - Live title-template updates for opened articles, with the configured site description as the default article name.
+- Production Docker image and Compose deployment with persistent content and database volumes.
 
 ### Security
 
