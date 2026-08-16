@@ -1,19 +1,16 @@
 import "./globals.css";
-import { formatSiteTitle } from "@/lib/site-config";
-import { readSiteConfig } from "@/lib/site-config-server";
+import { formatSiteTitle, mergeSiteConfig } from "@/lib/site-config";
+import siteConfigValue from "@/config/site.config.json";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-export const dynamic = "force-dynamic";
+const siteConfig = mergeSiteConfig(siteConfigValue);
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { config } = readSiteConfig();
-  return {
-    title: formatSiteTitle(config),
-    description: config.description,
-    icons: { icon: config.favicon },
-  };
-}
+export const metadata: Metadata = {
+  title: formatSiteTitle(siteConfig),
+  description: siteConfig.description,
+  icons: { icon: siteConfig.favicon },
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

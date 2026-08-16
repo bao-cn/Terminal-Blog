@@ -19,6 +19,7 @@ import {
   FolderInput,
   FolderOpen,
   ImageIcon,
+  Info,
   PanelRightClose,
   PanelRightOpen,
   ShieldCheck,
@@ -54,6 +55,7 @@ import { parseFrontmatter, serializeArticleDocument } from "@/lib/article-codec"
 import { splitCommand, splitPipeline } from "@/lib/terminal-command-parser";
 import { runTextPipeline, runTextStage } from "@/lib/terminal-text-pipeline";
 import { isSiteConfigVirtualPath, SITE_CONFIG_VIRTUAL_PATH } from "@/lib/virtual-paths";
+import { createTerminalApi, demoInfo } from "@/lib/demo-runtime";
 
 const SETTINGS_KEY = "terminal-blog-settings-v1";
 const CONFIG_MD5_KEY = "terminal-blog-config-md5-v1";
@@ -326,6 +328,15 @@ export default function TerminalBlog({
   const [cursorLeft, setCursorLeft] = useState(0);
   const [cursorWidth, setCursorWidth] = useState(8);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [terminalApi] = useState(() =>
+    createTerminalApi({
+      accessFiles: initialAccessFiles,
+      articles: initialArticles.length ? initialArticles : seedArticles,
+      categories: initialCategories.length ? initialCategories : defaultCategories.map((category) => category.slug),
+      config: initialConfig,
+    }),
+  );
+  const apiFetch = terminalApi.fetch;
   const inputRef = useRef<HTMLInputElement>(null);
   const outputRef = useRef<HTMLDivElement>(null);
   const scrollbackPositionRef = useRef(0);
@@ -349,6 +360,10 @@ export default function TerminalBlog({
   const promptPath = currentPath === "/" ? "~" : `~/${currentPath}`;
   const copy = uiText[language];
   const resolvedTheme = themeMode === "auto" ? systemTheme : themeMode;
+  const demoVersionLabel =
+    demoInfo.baseRef === `v${demoInfo.baseVersion}`
+      ? demoInfo.baseRef
+      : `${demoInfo.baseRef} · v${demoInfo.baseVersion}`;
   const say = (zh: string, en: string) => (language === "en" ? en : zh);
   const cookieNoticePrompt = [
     siteConfig.cookieNotice.message,
@@ -418,7 +433,7 @@ export default function TerminalBlog({
 
   useEffect(() => {
     let active = true;
-    fetch("/api/site-config", { cache: "no-store" })
+    apiFetch("/api/site-config", { cache: "no-store" })
       .then(async (response) => ({
         config: (await response.json()) as SiteConfig,
         md5: response.headers.get("X-Site-Config-MD5"),
@@ -433,7 +448,7 @@ export default function TerminalBlog({
     return () => {
       active = false;
     };
-  }, []);
+  }, [apiFetch]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -611,7 +626,7 @@ export default function TerminalBlog({
 
   const authenticateRoot = async (password: string) => {
     try {
-      const response = await fetch("/api/auth", {
+      const response = await apiFetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
@@ -641,7 +656,7 @@ export default function TerminalBlog({
 
   const authenticateSudo = async (password: string, command: string) => {
     try {
-      const response = await fetch("/api/auth", {
+      const response = await apiFetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password, session: false }),
@@ -665,7 +680,7 @@ export default function TerminalBlog({
 
   const changeRootPassword = async (password: string, authorizationToken?: string) => {
     try {
-      const response = await fetch("/api/auth", {
+      const response = await apiFetch("/api/auth", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -685,7 +700,7 @@ export default function TerminalBlog({
   };
 
   const persistArticle = async (article: Article, previousSourcePath?: string, authorizationToken?: string) => {
-    const response = await fetch("/api/articles", {
+    const response = await apiFetch("/api/articles", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1023,7 +1038,7 @@ export default function TerminalBlog({
       case "logout":
         if (user === "root") {
           setUser("guest");
-          void fetch("/api/auth", { method: "DELETE" });
+          void apiFetch("/api/auth", { method: "DELETE" });
           success(say("root 会话已关闭，返回 guest。", "Root session closed. Returned to guest."));
         } else text(say("这是最后一个会话。连接保持开放。", "This is the final session. The link remains open."));
         break;
@@ -1123,7 +1138,7 @@ export default function TerminalBlog({
             error("usage: draft list");
             break;
           }
-          void fetch("/api/drafts", { headers: authorizationHeaders, cache: "no-store" })
+          void apiFetch("/api/drafts", { headers: authorizationHeaders, cache: "no-store" })
             .then(async (response) => {
               const result = (await response.json().catch(() => ({}))) as {
                 ok?: boolean;
@@ -1151,7 +1166,7 @@ export default function TerminalBlog({
             error("usage: draft edit <id>");
             break;
           }
-          void fetch(`/api/drafts?id=${encodeURIComponent(draftId)}`, {
+          void apiFetch(`/api/drafts?id=${encodeURIComponent(draftId)}`, {
             headers: authorizationHeaders,
             cache: "no-store",
           })
@@ -1176,7 +1191,7 @@ export default function TerminalBlog({
             error("usage: draft publish <id>");
             break;
           }
-          void fetch("/api/drafts", {
+          void apiFetch("/api/drafts", {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
@@ -1213,7 +1228,7 @@ export default function TerminalBlog({
             error("usage: draft rm <id>");
             break;
           }
-          void fetch(`/api/drafts?id=${encodeURIComponent(draftId)}`, {
+          void apiFetch(`/api/drafts?id=${encodeURIComponent(draftId)}`, {
             method: "DELETE",
             headers: authorizationHeaders,
           })
@@ -1250,7 +1265,7 @@ export default function TerminalBlog({
           error(say("邮箱地址无效。", "Invalid email address."));
           break;
         }
-        void fetch("/api/site-config", {
+        void apiFetch("/api/site-config", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -1279,7 +1294,7 @@ export default function TerminalBlog({
           if (!article) error(`找不到文章: ${args[0]}`);
           else if (!target) error(`找不到分类: ${args[1]}`);
           else {
-            void fetch("/api/articles", {
+            void apiFetch("/api/articles", {
               method: "PATCH",
               headers: {
                 "Content-Type": "application/json",
@@ -1314,7 +1329,7 @@ export default function TerminalBlog({
           break;
         }
         const requestedCategory = args.join(" ");
-        void fetch("/api/categories", {
+        void apiFetch("/api/categories", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -1360,7 +1375,7 @@ export default function TerminalBlog({
         const formData = new FormData();
         formData.set("file", file);
         formData.set("targetPath", targetPath);
-        void fetch("/api/upload", {
+        void apiFetch("/api/upload", {
           method: "POST",
           headers: options.authorizationToken ? { Authorization: `Bearer ${options.authorizationToken}` } : undefined,
           body: formData,
@@ -1401,7 +1416,7 @@ export default function TerminalBlog({
           const article = resolveArticle(args.join(" "));
           if (!article) error(`找不到文章: ${args.join(" ")}`);
           else {
-            void fetch(`/api/articles?id=${encodeURIComponent(article.id)}`, {
+            void apiFetch(`/api/articles?id=${encodeURIComponent(article.id)}`, {
               method: "DELETE",
               headers: options.authorizationToken
                 ? { Authorization: `Bearer ${options.authorizationToken}` }
@@ -1427,7 +1442,13 @@ export default function TerminalBlog({
       case "reset":
         if (effectiveUser !== "root") error("权限不足。reset 仅对 root 开放。");
         else {
-          setArticles(seedArticles);
+          terminalApi.reset();
+          setArticles(initialArticles.length ? initialArticles : seedArticles);
+          setCategorySlugs(
+            initialCategories.length ? initialCategories : defaultCategories.map((category) => category.slug),
+          );
+          setAccessFiles(initialAccessFiles);
+          setSiteConfig(initialConfig);
           success("示例档案已恢复。 ");
         }
         break;
@@ -1769,7 +1790,7 @@ export default function TerminalBlog({
       } catch {
         throw new Error(say("配置不是有效的 JSON。", "Configuration is not valid JSON."));
       }
-      const response = await fetch("/api/site-config", {
+      const response = await apiFetch("/api/site-config", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -1812,7 +1833,7 @@ export default function TerminalBlog({
     };
     const previousSourcePath = editor.sourcePath;
     if (editor.target === "draft") {
-      const response = await fetch("/api/drafts", {
+      const response = await apiFetch("/api/drafts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1848,7 +1869,17 @@ export default function TerminalBlog({
   };
 
   return (
-    <main className={`site-shell theme-${resolvedTheme}`}>
+    <main className={`site-shell theme-${resolvedTheme} ${demoInfo.enabled ? "demo-mode" : ""}`}>
+      {demoInfo.enabled && (
+        <div className="demo-banner" role="status">
+          <Info size={14} aria-hidden="true" />
+          <strong>DEMO</strong>
+          <span>{language === "en" ? "Temporary in-memory data" : "临时内存数据"}</span>
+          <span className="demo-banner-detail">
+            {language === "en" ? "Resets on refresh" : "刷新后重置"} · {demoVersionLabel} · root/root
+          </span>
+        </div>
+      )}
       <section className={`workspace ${railOpen ? "" : "rail-collapsed"}`}>
         <div className={`terminal-window ${windowFocused ? "window-focused" : "window-blurred"}`}>
           <div className="terminal-bar">

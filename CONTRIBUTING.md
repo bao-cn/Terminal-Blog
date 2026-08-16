@@ -56,6 +56,7 @@ chore/<topic>      工具链和维护工作
 ### 4. 架构约束
 
 - React 组件负责视图和交互协调，不应直接实现可独立测试的解析、认证或持久化算法。
+- 浏览器端 `/api/*` 请求必须经过 `lib/demo-runtime.ts` 的统一网关，确保 `demo` 分支可以用内存实现替换服务端 API。
 - 新命令必须注册到 `lib/command-registry.ts`，以便帮助、参数提示和补全自动生效。
 - 纯命令解析和管道处理放在 `lib/terminal-command-parser.ts`、`lib/terminal-text-pipeline.ts` 或新的高内聚模块。
 - Route Handler 必须使用 `lib/request-security.ts` 和 Zod Schema，不直接调用无上限的 `request.json()` 或 `request.formData()`。
@@ -187,6 +188,7 @@ Use this order for releases:
 ### 4. Architecture rules
 
 - React components coordinate view state; independently testable parsing, authentication, and persistence logic belongs in `lib/`.
+- Browser-side `/api/*` requests must go through the gateway in `lib/demo-runtime.ts` so the `demo` branch can replace server APIs with its in-memory implementation.
 - Register every new command in `lib/command-registry.ts` so help, completion, and argument hints stay automatic.
 - Put pure command and pipeline logic in focused modules such as `terminal-command-parser.ts` and `terminal-text-pipeline.ts`.
 - Route Handlers must use the bounded request readers, same-origin policy, and Zod schemas. Do not introduce unrestricted `request.json()` or `request.formData()` calls.

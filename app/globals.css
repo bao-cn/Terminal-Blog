@@ -71,6 +71,30 @@ select:focus-visible {
   background: rgba(var(--signal-rgb), 0.02);
 }
 
+.demo-banner {
+  position: relative;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 14px;
+  gap: 9px;
+  color: #111111;
+  background: #f0ad4e;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.demo-banner strong {
+  font-size: 12px;
+}
+
+.demo-banner-detail {
+  color: rgba(0, 0, 0, 0.72);
+}
+
 .site-shell.theme-light {
   --bg: #ffffff;
   --panel: rgba(255, 255, 255, 0.965);
@@ -2126,6 +2150,21 @@ select:focus-visible {
   padding: 0;
 }
 
+@media (max-width: 580px) {
+  .demo-banner {
+    justify-content: flex-start;
+    min-height: 38px;
+    overflow: hidden;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .demo-banner-detail {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .terminal-window {
   grid-template-rows: 38px minmax(0, 1fr);
   width: 100%;
@@ -2961,5 +3000,18 @@ select:focus-visible {
   .side-rail.open .ftp-files button,
   .side-rail.open .ftp-files a {
     font-size: 13px;
+  }
+}
+
+/* Keep the persistent demo notice outside the terminal viewport. */
+.site-shell.demo-mode .workspace,
+.site-shell.demo-mode .workspace.rail-collapsed {
+  height: calc(100dvh - 32px);
+}
+
+@media (max-width: 580px) {
+  .site-shell.demo-mode .workspace,
+  .site-shell.demo-mode .workspace.rail-collapsed {
+    height: calc(100dvh - 38px);
   }
 }

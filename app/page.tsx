@@ -1,23 +1,19 @@
 import TerminalBlog from "@/components/TerminalBlog";
-import { headers } from "next/headers";
-import { loadArticleCategories, loadArticles } from "@/lib/article-store";
-import { readSiteConfig } from "@/lib/site-config-server";
-import { loadAccessFiles } from "@/lib/upload-store";
+import { categories, seedArticles } from "@/lib/blog-data";
+import { mergeSiteConfig } from "@/lib/site-config";
+import siteConfigValue from "@/config/site.config.json";
 
-export const dynamic = "force-dynamic";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const forwardedAddress =
-    requestHeaders.get("x-forwarded-for")?.split(",")[0]?.trim() || requestHeaders.get("x-real-ip") || "public.gateway";
-  const { config } = readSiteConfig();
+export default function Home() {
+  const demoArticles = seedArticles.map((article) => ({
+    ...article,
+    sourcePath: `articles/${article.category}/${article.id}.md`,
+  }));
   return (
     <TerminalBlog
-      initialAccessFiles={loadAccessFiles()}
-      initialArticles={loadArticles()}
-      initialCategories={loadArticleCategories()}
-      initialConfig={config}
-      sourceAddress={forwardedAddress}
+      initialArticles={demoArticles}
+      initialCategories={categories.map((category) => category.slug)}
+      initialConfig={mergeSiteConfig(siteConfigValue)}
+      sourceAddress="demo.static.host"
     />
   );
 }

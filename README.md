@@ -121,6 +121,19 @@ npm run start
 
 生产部署应提供持久化的 `articles/`、`draft/`、`access/` 和 `data/` 目录。只部署无状态容器但不挂载这些目录会导致文章、附件或数据库在重新部署后丢失。
 
+### DEMO 静态部署
+
+`demo` 分支是面向静态网页托管的演示版本。它在构建时写入 mock 种子文章，浏览器端用统一的内存数据网关模拟登录、文章、草稿、分类、配置和附件管理，不读取 SQLite，也不会向服务器写入数据。刷新页面或执行 `reset` 后，管理员改动会恢复为初始状态。
+
+```bash
+git switch demo
+npm install
+npm run build
+npm run start
+```
+
+静态文件位于 `out/`，可以直接上传到 GitHub Pages、Cloudflare Pages、Netlify 等静态托管平台。页面顶部会显示 DEMO、基线版本和 `root/root` 演示凭据；不要把这个凭据或 DEMO 构建用于生产环境。默认基线取自 `package.json`，发布时可用 `DEMO_BASE_VERSION` 和 `DEMO_BASE_REF` 覆盖显示值。
+
 ## 默认管理员与安全提示
 
 首次创建数据库且没有设置 `TERMINAL_ROOT_PASSWORD` 时：

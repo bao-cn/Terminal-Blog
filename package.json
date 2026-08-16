@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "serve out",
     "lint": "eslint .",
     "test": "vitest run"
   },
@@ -33,6 +33,7 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.1",
     "prettier": "^3.9.6",
+    "serve": "^14.2.6",
     "typescript": "^5.9.0",
     "vitest": "^3.2.7"
   }

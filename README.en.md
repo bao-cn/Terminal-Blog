@@ -121,6 +121,19 @@ npm run start
 
 A production deployment needs persistent volumes for `articles/`, `draft/`, `access/`, and `data/`. An ephemeral container without those volumes will lose content, uploads, or database state during redeployment.
 
+### DEMO static deployment
+
+The `demo` branch is the static-hosting edition. It ships mock seed articles at build time and uses one browser-side in-memory data gateway to simulate authentication, articles, drafts, categories, configuration, and uploads. It never reads SQLite or writes to a server. Refreshing the page or running `reset` restores the initial state.
+
+```bash
+git switch demo
+npm install
+npm run build
+npm run start
+```
+
+The static output is in `out/` and can be uploaded to GitHub Pages, Cloudflare Pages, Netlify, or another static host. The page header identifies DEMO, the base version, and the `root/root` demo credentials; do not use this credential or build for production. The base version comes from `package.json` by default and can be displayed differently with `DEMO_BASE_VERSION` and `DEMO_BASE_REF`.
+
 ## Default Administrator and Security Warning
 
 When the database is created for the first time without `TERMINAL_ROOT_PASSWORD`, the initial credentials are:
