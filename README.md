@@ -218,8 +218,21 @@ sudo nano config
 - 联系邮箱
 - ICP 与公安备案信息
 - 友情链接
-- Cookie 提示
+- Cookie / 本地存储提示开关与文案
 - 访问来源回退名称
+
+Cookie 提示使用以下结构：
+
+```json
+{
+  "cookieNotice": {
+    "enable": true,
+    "message": "本站使用本地存储保存语言、主题和终端偏好。"
+  }
+}
+```
+
+启用后，尚未选择的访客会在首次进入时于回滚缓冲区末尾看到提示。输入 `y` 表示同意，输入 `n` 或按 `Ctrl+C` 表示拒绝；选择会保存到 localStorage，后续访问不再重复提示。旧版字符串形式的 `cookieNotice` 仍可读取，并按启用状态处理。
 
 ## 命令系统
 
@@ -308,7 +321,7 @@ flowchart TD
 ### 请求与状态流
 
 1. 服务端每次页面请求读取站点配置、文章目录、分类和附件列表。
-2. 客户端只把主题、语言和配置 MD5 保存到 localStorage；文章不从 localStorage 恢复，服务端数据始终是权威来源。
+2. 客户端只把主题、语言、Cookie 提示选择和配置 MD5 保存到 localStorage；文章不从 localStorage 恢复，服务端数据始终是权威来源。
 3. mutation 请求经过同源检查、认证、请求大小限制和 Zod 校验。
 4. 文件系统写入成功后同步 SQLite metadata 索引。
 5. 客户端在服务端确认成功之后更新文章状态，避免无回滚的乐观更新。

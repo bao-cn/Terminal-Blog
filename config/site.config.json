@@ -14,5 +14,8 @@
     { "label": "Next.js", "href": "https://nextjs.org" },
     { "label": "React", "href": "https://react.dev" }
   ],
-  "cookieNotice": "本站使用本地存储保存语言、主题和终端偏好。"
+  "cookieNotice": {
+    "enable": true,
+    "message": "本站使用本地存储保存语言、主题和终端偏好。"
+  }
 }
