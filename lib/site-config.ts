@@ -7,6 +7,10 @@ export type SiteConfig = {
   sourceFallback: string;
   filings: { icp: string; police: string };
   friendlyLinks: Array<{ label: string; href: string }>;
+  github: {
+    enable: boolean;
+    href: string;
+  };
   cookieNotice: {
     enable: boolean;
     message: string;
@@ -29,6 +33,10 @@ export const defaultSiteConfig: SiteConfig = {
     { label: "Next.js", href: "https://nextjs.org" },
     { label: "React", href: "https://react.dev" },
   ],
+  github: {
+    enable: true,
+    href: "https://github.com/bao-cn/Terminal-Blog",
+  },
   cookieNotice: {
     enable: true,
     message: "本站使用本地存储保存语言、主题和终端偏好。",
@@ -38,7 +46,10 @@ export const defaultSiteConfig: SiteConfig = {
 export function mergeSiteConfig(value: unknown): SiteConfig {
   const candidate =
     value && typeof value === "object" && !Array.isArray(value)
-      ? (value as Partial<Omit<SiteConfig, "cookieNotice">> & { cookieNotice?: unknown })
+      ? (value as Partial<Omit<SiteConfig, "cookieNotice" | "github">> & {
+          cookieNotice?: unknown;
+          github?: unknown;
+        })
       : {};
   const filings: Partial<SiteConfig["filings"]> =
     candidate.filings && typeof candidate.filings === "object" ? candidate.filings : {};
@@ -49,6 +60,19 @@ export function mergeSiteConfig(value: unknown): SiteConfig {
       )
     : [];
   const cookieNotice = candidate.cookieNotice;
+  const github =
+    candidate.github && typeof candidate.github === "object"
+      ? (candidate.github as Partial<SiteConfig["github"]>)
+      : undefined;
+  let githubHref = defaultSiteConfig.github.href;
+  if (typeof github?.href === "string") {
+    try {
+      const parsed = new URL(github.href);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") githubHref = github.href;
+    } catch {
+      // Invalid or relative links fall back to the public project URL.
+    }
+  }
   const cookieNoticeFields =
     cookieNotice && typeof cookieNotice === "object"
       ? (cookieNotice as Partial<SiteConfig["cookieNotice"]>)
@@ -82,6 +106,10 @@ export function mergeSiteConfig(value: unknown): SiteConfig {
       police: typeof filings.police === "string" ? filings.police : defaultSiteConfig.filings.police,
     },
     friendlyLinks: friendlyLinks.length ? friendlyLinks : defaultSiteConfig.friendlyLinks,
+    github: {
+      enable: typeof github?.enable === "boolean" ? github.enable : defaultSiteConfig.github.enable,
+      href: githubHref,
+    },
     cookieNotice: normalizedCookieNotice,
   };
 }

@@ -231,6 +231,7 @@ sudo nano config
 - 联系邮箱
 - ICP 与公安备案信息
 - 友情链接
+- GitHub 按钮开关与项目地址
 - Cookie / 本地存储提示开关与文案
 - 访问来源回退名称
 
@@ -238,6 +239,10 @@ Cookie 提示使用以下结构：
 
 ```json
 {
+  "github": {
+    "enable": true,
+    "href": "https://github.com/bao-cn/Terminal-Blog"
+  },
   "cookieNotice": {
     "enable": true,
     "message": "本站使用本地存储保存语言、主题和终端偏好。"
@@ -245,7 +250,9 @@ Cookie 提示使用以下结构：
 }
 ```
 
-启用后，尚未选择的访客会在首次进入时于回滚缓冲区末尾看到提示。输入 `y` 表示同意，输入 `n` 或按 `Ctrl+C` 表示拒绝；选择会保存到 localStorage，后续访问不再重复提示。旧版字符串形式的 `cookieNotice` 仍可读取，并按启用状态处理。
+将 `github.enable` 设为 `false` 可隐藏终端右上角的项目按钮。
+
+Cookie 提示启用后，尚未选择的访客会在首次进入时于回滚缓冲区末尾看到提示。输入 `y` 表示同意，输入 `n` 或按 `Ctrl+C` 表示拒绝；选择会保存到 localStorage，后续访问不再重复提示。旧版字符串形式的 `cookieNotice` 仍可读取，并按启用状态处理。
 
 标题模板会同时用于服务端 metadata 和浏览器标签标题。未打开文章时，`{ArticleName}` 使用站点 `description`；通过 `cat` 或 `less` 打开文章后，它会替换为文章标题，`{BlogName}` 始终使用当前博客名称。
 

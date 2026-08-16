@@ -231,6 +231,7 @@ sudo nano config
 - Contact email
 - ICP and public-security filing text
 - Friendly links
+- GitHub button visibility and project URL
 - Cookie / local-storage notice toggle and message
 - Source-address fallback label
 
@@ -238,6 +239,10 @@ The cookie notice uses this structure:
 
 ```json
 {
+  "github": {
+    "enable": true,
+    "href": "https://github.com/bao-cn/Terminal-Blog"
+  },
   "cookieNotice": {
     "enable": true,
     "message": "This site stores language, theme, and terminal preferences locally."
@@ -245,7 +250,9 @@ The cookie notice uses this structure:
 }
 ```
 
-When enabled, a visitor without a stored choice sees the notice at the end of the scrollback on first entry. Enter `y` to accept, or enter `n` / press `Ctrl+C` to decline. The choice is stored in localStorage so later visits do not repeat the prompt. Legacy string values for `cookieNotice` remain readable and are treated as enabled.
+Set `github.enable` to `false` to hide the project button in the terminal's top-right corner.
+
+When the cookie notice is enabled, a visitor without a stored choice sees it at the end of the scrollback on first entry. Enter `y` to accept, or enter `n` / press `Ctrl+C` to decline. The choice is stored in localStorage so later visits do not repeat the prompt. Legacy string values for `cookieNotice` remain readable and are treated as enabled.
 
 The title template drives both server metadata and the browser tab title. Before an article is opened, `{ArticleName}` uses the site `description`; after `cat` or `less` opens an article, it uses that article's title. `{BlogName}` always uses the current blog name.
 

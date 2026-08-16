@@ -2,6 +2,16 @@ import { describe, expect, it } from "vitest";
 import { defaultSiteConfig, formatSiteTitle, mergeSiteConfig } from "../lib/site-config";
 
 describe("site configuration", () => {
+  it("normalizes the GitHub button configuration", () => {
+    expect(mergeSiteConfig({ github: { enable: false } }).github).toEqual({
+      enable: false,
+      href: defaultSiteConfig.github.href,
+    });
+    expect(mergeSiteConfig({ github: { href: "javascript:alert(1)" } }).github.href).toBe(
+      defaultSiteConfig.github.href,
+    );
+  });
+
   it("normalizes the cookie notice object", () => {
     const config = mergeSiteConfig({ cookieNotice: { enable: false, message: "No storage." } });
     expect(config.cookieNotice).toEqual({ enable: false, message: "No storage." });

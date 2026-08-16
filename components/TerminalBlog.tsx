@@ -15,6 +15,7 @@ import {
   BookOpenText,
   ChevronRight,
   CircleUserRound,
+  CodeXml,
   Command,
   FolderInput,
   FolderOpen,
@@ -97,6 +98,7 @@ const uiText = {
     writeFile: "写入文件",
     cookieConsentInput: "y / n",
     placeholder: "输入 help 命令获取帮助，输入 / 打开命令菜单。",
+    github: "在 GitHub 查看项目",
   },
   en: {
     friendlyLinks: "FRIENDLY LINKS",
@@ -133,6 +135,7 @@ const uiText = {
     writeFile: "WRITE FILE",
     cookieConsentInput: "y / n",
     placeholder: "Enter the 'help' command to get helps, enter '/' to invoke the command menu.",
+    github: "View project on GitHub",
   },
 };
 
@@ -1894,7 +1897,18 @@ export default function TerminalBlog({
               <ChevronRight size={13} suppressHydrationWarning />
               <b>{pathLabel}</b>
             </div>
-            <span className="terminal-bar-spacer" aria-hidden="true" />
+            {siteConfig.github.enable && (
+              <a
+                className="github-link"
+                href={siteConfig.github.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={copy.github}
+                title={copy.github}
+              >
+                <CodeXml size={16} aria-hidden="true" />
+              </a>
+            )}
           </div>
 
           <div
