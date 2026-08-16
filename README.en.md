@@ -305,6 +305,10 @@ sudo nano config
   "blogName": "terminal.blog",
   "description": "Field notes from the command line.",
   "titleTemplate": "{BlogName} | {ArticleName}",
+  "github": {
+    "enable": true,
+    "href": "https://github.com/bao-cn/Terminal-Blog"
+  },
   "cookieNotice": {
     "enable": true,
     "message": "This site stores language, theme, and terminal preferences locally."
@@ -313,6 +317,7 @@ sudo nano config
 ```
 
 - `titleTemplate` supports `{BlogName}` and `{ArticleName}`. It drives server metadata and the browser tab; before an article is opened, `{ArticleName}` uses the site description, and after an article is opened it uses the article title.
+- `github.enable` controls the project button in the terminal's top-right corner, while `github.href` sets its HTTP(S) destination.
 - `cookieNotice.enable` controls the first-visit prompt. When enabled and no localStorage choice exists, the notice is appended to the end of the scrollback; enter `y` to accept, or `n` / `Ctrl+C` to decline. The choice is stored and the prompt is not shown again.
 - The site configuration also supports the favicon, contact email, friendly links, ICP / public-security filing text, and a source-address fallback label.
 

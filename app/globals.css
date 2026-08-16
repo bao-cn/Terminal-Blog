@@ -335,6 +335,25 @@ select:focus-visible {
   white-space: nowrap;
 }
 
+.github-link {
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  width: 31px;
+  height: 29px;
+  color: var(--muted);
+  border: 1px solid transparent;
+  border-radius: 2px;
+}
+
+.github-link:hover,
+.github-link:focus-visible {
+  color: var(--green);
+  border-color: var(--line);
+  background: rgba(var(--signal-rgb), 0.06);
+  outline: none;
+}
+
 .terminal-tools {
   justify-content: flex-end;
   gap: 3px;

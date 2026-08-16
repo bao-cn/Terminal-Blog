@@ -305,6 +305,10 @@ sudo nano config
   "blogName": "terminal.blog",
   "description": "Field notes from the command line.",
   "titleTemplate": "{BlogName} | {ArticleName}",
+  "github": {
+    "enable": true,
+    "href": "https://github.com/bao-cn/Terminal-Blog"
+  },
   "cookieNotice": {
     "enable": true,
     "message": "本站使用本地存储保存语言、主题和终端偏好。"
@@ -313,6 +317,7 @@ sudo nano config
 ```
 
 - `titleTemplate` 支持 `{BlogName}` 和 `{ArticleName}`。它同时用于服务端 metadata 和浏览器标签；未打开文章时，`{ArticleName}` 使用站点描述，打开文章后使用文章标题。
+- `github.enable` 控制终端右上角项目按钮的显示，`github.href` 设置按钮指向的 HTTP(S) 地址。
 - `cookieNotice.enable` 控制首访提示。启用且 localStorage 没有选择时，提示会追加到滚动缓冲区末尾；输入 `y` 同意，输入 `n` 或按 `Ctrl+C` 拒绝。选择保存后不会重复提示。
 - 站点配置还支持 favicon、联系邮箱、友情链接、ICP / 公安备案信息和来源地址回退名称。
 

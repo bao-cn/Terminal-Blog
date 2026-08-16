@@ -14,6 +14,10 @@
     { "label": "Next.js", "href": "https://nextjs.org" },
     { "label": "React", "href": "https://react.dev" }
   ],
+  "github": {
+    "enable": true,
+    "href": "https://github.com/bao-cn/Terminal-Blog"
+  },
   "cookieNotice": {
     "enable": true,
     "message": "本站使用本地存储保存语言、主题和终端偏好。"
