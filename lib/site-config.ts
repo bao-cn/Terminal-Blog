@@ -89,5 +89,5 @@ export function mergeSiteConfig(value: unknown): SiteConfig {
 export function formatSiteTitle(config: SiteConfig, articleName = "") {
   return config.titleTemplate
     .replaceAll("{BlogName}", config.blogName)
-    .replaceAll("{ArticleName}", articleName || "Field notes from the command line");
+    .replaceAll("{ArticleName}", articleName.trim() || config.description);
 }
