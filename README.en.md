@@ -218,8 +218,21 @@ sudo nano config
 - Contact email
 - ICP and public-security filing text
 - Friendly links
-- Cookie notice
+- Cookie / local-storage notice toggle and message
 - Source-address fallback label
+
+The cookie notice uses this structure:
+
+```json
+{
+  "cookieNotice": {
+    "enable": true,
+    "message": "This site stores language, theme, and terminal preferences locally."
+  }
+}
+```
+
+When enabled, a visitor without a stored choice sees the notice at the end of the scrollback on first entry. Enter `y` to accept, or enter `n` / press `Ctrl+C` to decline. The choice is stored in localStorage so later visits do not repeat the prompt. Legacy string values for `cookieNotice` remain readable and are treated as enabled.
 
 ## Command System
 
@@ -308,7 +321,7 @@ flowchart TD
 ### Request and state flow
 
 1. Every page request reads current site configuration, articles, categories, and attachments on the server.
-2. The client stores only theme, language, and configuration MD5 in localStorage. Articles are never restored from localStorage; server data remains authoritative.
+2. The client stores only theme, language, the cookie-notice choice, and configuration MD5 in localStorage. Articles are never restored from localStorage; server data remains authoritative.
 3. Mutation requests pass origin, authentication, size, Content-Type, and Zod checks.
 4. Successful filesystem changes synchronize the SQLite metadata index.
 5. Client article state changes only after server confirmation, avoiding irreversible optimistic updates.
