@@ -7,7 +7,10 @@ export type SiteConfig = {
   sourceFallback: string;
   filings: { icp: string; police: string };
   friendlyLinks: Array<{ label: string; href: string }>;
-  cookieNotice: string;
+  cookieNotice: {
+    enable: boolean;
+    message: string;
+  };
 };
 
 export const defaultSiteConfig: SiteConfig = {
@@ -26,11 +29,17 @@ export const defaultSiteConfig: SiteConfig = {
     { label: "Next.js", href: "https://nextjs.org" },
     { label: "React", href: "https://react.dev" },
   ],
-  cookieNotice: "本站使用本地存储保存语言、主题和终端偏好。",
+  cookieNotice: {
+    enable: true,
+    message: "本站使用本地存储保存语言、主题和终端偏好。",
+  },
 };
 
 export function mergeSiteConfig(value: unknown): SiteConfig {
-  const candidate = value && typeof value === "object" && !Array.isArray(value) ? (value as Partial<SiteConfig>) : {};
+  const candidate =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Partial<Omit<SiteConfig, "cookieNotice">> & { cookieNotice?: unknown })
+      : {};
   const filings: Partial<SiteConfig["filings"]> =
     candidate.filings && typeof candidate.filings === "object" ? candidate.filings : {};
   const friendlyLinks = Array.isArray(candidate.friendlyLinks)
@@ -39,6 +48,26 @@ export function mergeSiteConfig(value: unknown): SiteConfig {
           Boolean(link) && typeof link === "object" && typeof link.label === "string" && typeof link.href === "string",
       )
     : [];
+  const cookieNotice = candidate.cookieNotice;
+  const cookieNoticeFields =
+    cookieNotice && typeof cookieNotice === "object"
+      ? (cookieNotice as Partial<SiteConfig["cookieNotice"]>)
+      : undefined;
+  const normalizedCookieNotice =
+    typeof cookieNotice === "string"
+      ? { enable: true, message: cookieNotice }
+      : cookieNoticeFields
+        ? {
+            enable:
+              typeof cookieNoticeFields.enable === "boolean"
+                ? cookieNoticeFields.enable
+                : defaultSiteConfig.cookieNotice.enable,
+            message:
+              typeof cookieNoticeFields.message === "string"
+                ? cookieNoticeFields.message
+                : defaultSiteConfig.cookieNotice.message,
+          }
+        : defaultSiteConfig.cookieNotice;
   return {
     blogName: typeof candidate.blogName === "string" ? candidate.blogName : defaultSiteConfig.blogName,
     contactEmail: typeof candidate.contactEmail === "string" ? candidate.contactEmail : defaultSiteConfig.contactEmail,
@@ -53,7 +82,7 @@ export function mergeSiteConfig(value: unknown): SiteConfig {
       police: typeof filings.police === "string" ? filings.police : defaultSiteConfig.filings.police,
     },
     friendlyLinks: friendlyLinks.length ? friendlyLinks : defaultSiteConfig.friendlyLinks,
-    cookieNotice: typeof candidate.cookieNotice === "string" ? candidate.cookieNotice : defaultSiteConfig.cookieNotice,
+    cookieNotice: normalizedCookieNotice,
   };
 }
 
