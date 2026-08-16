@@ -6,7 +6,6 @@
 <div align="center">
   <img src="./docs/header.png" style="margin-bottom: 1rem" />
 
-
 [English](./README.en.md) | **简体中文**
 
 ![License](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg) ![Node.js](https://img.shields.io/badge/Node.js-24%2B-339933.svg) ![Next.js](https://img.shields.io/badge/Next.js-16-black.svg) ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg) ![Version](https://img.shields.io/badge/Version-Beta-red.svg)
@@ -346,6 +345,19 @@ tests/                    Vitest 单元测试
 | `NODE_ENV`               | 由 Next.js 设置 | `development` | 控制 Secure Cookie、HSTS 和开发 CSP |
 
 站点内容配置不使用 Next.js 静态缓存。页面请求会读取 SQLite 或初始 JSON，并生成 MD5 供客户端判断配置是否发生变化。
+
+## Docker 部署
+
+项目使用 Next.js standalone 输出构建生产镜像。先设置首次初始化 root 凭据所需的高强度密码，再启动服务：
+
+```bash
+export TERMINAL_ROOT_PASSWORD='replace-with-a-random-secret-at-least-16-characters'
+docker compose up --build -d
+```
+
+默认监听 `http://localhost:3000`。可通过 `TERMINAL_BLOG_PORT` 修改宿主机端口。Compose 使用命名卷持久化 `articles/`、`draft/`、`access/` 和 `data/`；删除容器不会删除这些内容，执行 `docker compose down -v` 才会移除卷和其中的数据。
+
+生产环境应在容器前部署 nginx、Caddy 等反向代理，并由代理处理 TLS、请求限速和异常连接。`TERMINAL_ROOT_PASSWORD` 只在数据库首次创建 root 凭据时生效，之后修改环境变量不会覆盖已有密码。
 
 ## 开发与质量检查
 
