@@ -331,7 +331,7 @@ npm run build
 1. 从最新 `main` 创建单一职责的 `feat/`、`fix/`、`docs/` 或 `refactor/` 特性分支。
 2. 在特性分支完成实现和检查，提交使用 Conventional Commits。
 3. 特性分支提交 Pull Request 到 `main`，由维护者 Code Review 并手动合并。
-4. 发布时从最新 `main` 创建 `release/<version>` 分支；发布修复先同步回 `main`。
+4. 发布时从最新 `main` 创建 `release/<version>` 分支，再在 GitHub Actions 中选择该分支手动运行 `Release` 工作流；发布修复先同步回 `main`。
 
 请不要提交文章、草稿、数据库、本地环境变量或 Agent 指令文件。安全漏洞不要公开提交利用细节，请使用 GitHub Security 页面中的 Private vulnerability reporting。
 

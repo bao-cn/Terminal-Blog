@@ -52,6 +52,10 @@ chore/<topic>      工具链和维护工作
 2. 准备发布时，从最新 `main` 创建 `release/<version>` 分支，例如 `release/0.1.0-beta.1`。
 3. 发布分支只接受版本号、CHANGELOG、发布说明和必要的发布修复。通用代码修复必须先同步到 `main`，再合入发布分支。
 4. 每个版本都要更新 `CHANGELOG.md`，版本号遵循 Semantic Versioning；预发布版本使用 `-alpha.N`、`-beta.N` 或 `-rc.N`。
+5. 在 GitHub Actions 中手动运行 `Release` 工作流，并在分支选择器中选择对应的 `release/<version>`。工作流会拒绝从 `main`、特性分支或版本号不匹配的分支发布。
+6. 可在 `related_issues` 输入框填写 `#12, #34` 等 Issue 编号。版本 Changelog 会完整保留，GitHub 自动生成的 Pull Request 和贡献者信息会追加到发布说明。
+7. 工作流通过 Prettier、ESLint、TypeScript、Vitest 和生产构建后，创建 `v<version>` 标签和 GitHub pre-release，并上传源码 ZIP、Linux x64 standalone 包和 SHA-256 校验文件。
+8. 发布失败后的通用修复仍应先提交到 `main`，再同步到版本分支并重新运行工作流。已经存在的版本标签不会被覆盖。
 
 ### 4. 架构约束
 
@@ -183,6 +187,10 @@ Use this order for releases:
 2. When preparing a release, create `release/<version>` from the latest `main`, for example `release/0.1.0-beta.1`.
 3. Release branches accept only version metadata, CHANGELOG updates, release notes, and necessary release fixes. General code fixes must land in `main` first and then be synchronized to the release branch.
 4. Update `CHANGELOG.md` for every release. Versions follow Semantic Versioning, with `-alpha.N`, `-beta.N`, or `-rc.N` suffixes for prereleases.
+5. Manually run the `Release` workflow in GitHub Actions and choose the matching `release/<version>` in the branch selector. The workflow rejects `main`, feature branches, and release branches whose name does not match `package.json`.
+6. Optionally enter issue numbers such as `#12, #34` in `related_issues`. The version's Changelog is preserved, and GitHub-generated Pull Request and contributor details are appended to the release notes.
+7. After Prettier, ESLint, TypeScript, Vitest, and the production build pass, the workflow creates the `v<version>` tag and GitHub pre-release, then uploads a source ZIP, Linux x64 standalone bundle, and SHA-256 checksums.
+8. General fixes for a failed release still land in `main` first and are then synchronized to the release branch before rerunning the workflow. Existing version tags are never overwritten.
 
 ### 4. Architecture rules
 

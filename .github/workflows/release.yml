@@ -1,0 +1,167 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      related_issues:
+        description: "Related issue numbers, for example: #12, #34"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish prerelease
+    if: github.ref_type == 'branch' && startsWith(github.ref_name, 'release/')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CI: true
+      GH_TOKEN: ${{ github.token }}
+      NEXT_TELEMETRY_DISABLED: 1
+
+    steps:
+      - name: Check out selected release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Validate release branch and metadata
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          version="$(node -p "require('./package.json').version")"
+          branch="release/${version}"
+          tag="v${version}"
+
+          if [[ "${version}" != *-* ]]; then
+            echo "Version ${version} is not a prerelease version." >&2
+            exit 1
+          fi
+
+          if [[ "${GITHUB_REF_NAME}" != "${branch}" ]]; then
+            echo "Selected branch ${GITHUB_REF_NAME} must match ${branch}." >&2
+            exit 1
+          fi
+
+          if ! grep -Fq "## [${version}] - " CHANGELOG.md; then
+            echo "CHANGELOG.md does not contain a dated ${version} section." >&2
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "Tag ${tag} already exists." >&2
+            exit 1
+          fi
+
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting
+        run: npx prettier --check .
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Check TypeScript
+        run: npx tsc --noEmit --incremental false
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build production application
+        run: npm run build
+
+      - name: Package release assets
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          bundle="terminal-blog-${VERSION}-linux-x64-standalone"
+          source="terminal-blog-${VERSION}-source"
+
+          mkdir -p "dist/${bundle}/.next" \
+            "dist/${bundle}/articles" \
+            "dist/${bundle}/draft" \
+            "dist/${bundle}/access" \
+            "dist/${bundle}/data"
+          cp -a .next/standalone/. "dist/${bundle}/"
+          cp -a .next/static "dist/${bundle}/.next/static"
+          cp -a public config "dist/${bundle}/"
+          cp README.md README.en.md CHANGELOG.md LICENSE .env.example "dist/${bundle}/"
+
+          tar -C dist -czf "dist/${bundle}.tar.gz" "${bundle}"
+          rm -rf "dist/${bundle}"
+
+          git archive --format=zip --prefix="${source}/" -o "dist/${source}.zip" HEAD
+          (
+            cd dist
+            sha256sum *.tar.gz *.zip > SHA256SUMS
+          )
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: terminal-blog-${{ steps.release.outputs.version }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Generate release notes
+        env:
+          RELATED_ISSUES: ${{ inputs.related_issues }}
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh api \
+            --method POST \
+            "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+            -f "tag_name=${TAG}" \
+            -f "target_commitish=${GITHUB_SHA}" \
+            > generated-release-notes.json
+
+          node .github/scripts/prepare-release-notes.mjs \
+            --version "${VERSION}" \
+            --changelog CHANGELOG.md \
+            --generated generated-release-notes.json \
+            --issues "${RELATED_ISSUES}" \
+            --output release-notes.md
+
+          cat release-notes.md >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Create GitHub prerelease
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh release create "${TAG}" dist/* \
+            --repo "${GITHUB_REPOSITORY}" \
+            --target "${GITHUB_SHA}" \
+            --title "Terminal Blog ${TAG}" \
+            --notes-file release-notes.md \
+            --prerelease

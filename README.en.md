@@ -331,7 +331,7 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the complete policy. The essentia
 1. Create a focused `feat/`, `fix/`, `docs/`, or `refactor/` branch from the latest `main`.
 2. Implement and verify the change on that branch, using Conventional Commits.
 3. Open a Pull Request from the feature branch to `main`; maintainers review and merge it manually.
-4. When releasing, create `release/<version>` from the latest `main`; synchronize release fixes back to `main` first.
+4. When releasing, create `release/<version>` from the latest `main`, select it in GitHub Actions, and manually run the `Release` workflow; synchronize release fixes back to `main` first.
 
 Do not commit articles, drafts, databases, local environment variables, or Agent instruction files. Do not disclose exploit details in public issues; use Private vulnerability reporting from the repository Security page.
 
