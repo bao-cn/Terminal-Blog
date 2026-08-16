@@ -1,11 +1,12 @@
 import "./globals.css";
 import { formatSiteTitle } from "@/lib/site-config";
 import { readSiteConfig } from "@/lib/site-config-server";
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   const { config } = readSiteConfig();
   return {
     title: formatSiteTitle(config),
