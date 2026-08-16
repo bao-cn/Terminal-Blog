@@ -1,2 +1,2 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Auto-detect text files, store them normalized, and keep Prettier-stable LF checkouts.
+* text=auto eol=lf
