@@ -76,13 +76,46 @@ See [`CHANGELOG.md`](./CHANGELOG.md) for the complete change history.
 
 These steps are for users who only want to run the blog; no knowledge of Next.js or the project code is required. Before the first deployment, prepare a high-entropy password for the root administrator. Do not use the default `root` password in production.
 
+### Choose a release asset
+
+When downloading from [GitHub Releases](https://github.com/bao-cn/Terminal-Blog/releases), choose the asset that matches your platform and use case:
+
+| Asset                                                         | Purpose                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `terminal-blog-<version>-linux-x64-standalone.tar.gz`         | A prebuilt Linux x64 application containing the production build and runtime dependencies. Node.js 24 or newer is still required; start it with `node server.js` after extraction. Native dependencies such as `better-sqlite3` make this package incompatible with Windows, macOS, and ARM64. |
+| `terminal-blog-<version>-source.zip`                          | A versioned source package for Windows, Linux, macOS, ARM64, customization, or local rebuilding. Run `npm install`, `npm run build`, and `npm run start`.                                                                                                                                      |
+| `SHA256SUMS`                                                  | SHA-256 checksums for the two custom release assets above, used to verify download integrity.                                                                                                                                                                                                  |
+| GitHub-generated `Source code (zip)` / `Source code (tar.gz)` | Source archives generated automatically from the release tag. They are similar to the custom source ZIP but are not covered by the project's `SHA256SUMS`.                                                                                                                                     |
+
+Docker deployment does not use the standalone archive. Download the source package or a GitHub-generated source archive, which includes `Dockerfile` and `compose.yaml`.
+
 ### Option 1: Manual deployment
 
-Use this option when you do not want Docker and plan to run the application directly on Windows, Linux, or macOS.
+#### Linux x64 quick deployment
 
-1. Install [Node.js 24 or newer](https://nodejs.org/); npm is included with the installer.
-2. Click **Code → Download ZIP** in the GitHub repository and extract it to a permanent directory such as `terminal-blog`.
-3. Open PowerShell, a terminal, or Command Prompt in that directory and install dependencies:
+1. Install [Node.js 24 or newer](https://nodejs.org/); npm and a local rebuild are not required.
+2. Download `terminal-blog-0.1.0-beta.1-linux-x64-standalone.tar.gz` from the Release page, then extract and start it:
+
+   ```bash
+   tar -xzf terminal-blog-0.1.0-beta.1-linux-x64-standalone.tar.gz
+   cd terminal-blog-0.1.0-beta.1-linux-x64-standalone
+   export TERMINAL_ROOT_PASSWORD='your-strong-password'
+   node server.js
+   ```
+
+3. Open <http://localhost:3000> in a browser. Keep the terminal window running; press `Ctrl+C` to stop the service.
+
+To verify the download before extracting it, place the archive and `SHA256SUMS` in the same directory and run:
+
+```bash
+sha256sum -c SHA256SUMS --ignore-missing
+```
+
+#### Windows, macOS, ARM64, or source deployment
+
+1. Download `terminal-blog-<version>-source.zip` from the Release page and extract it to a permanent directory such as `terminal-blog`.
+2. Install [Node.js 24 or newer](https://nodejs.org/); npm is included with the installer.
+3. Open PowerShell, a terminal, or Command Prompt in the extracted directory and install dependencies:
 
    ```bash
    npm install
@@ -125,7 +158,7 @@ To update a manual installation, back up these directories and press `Ctrl+C` to
 Use this option with Docker Desktop (Windows, macOS) or Docker Engine and Compose v2 (Linux). Docker handles Node.js and native dependencies automatically, so it is the recommended option for most users.
 
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine, then confirm that `docker compose version` works.
-2. Download and extract the project ZIP. Create a `.env` file in the project directory:
+2. Download and extract `terminal-blog-<version>-source.zip` or a GitHub-generated source archive. Create a `.env` file in the project directory:
 
    ```dotenv
    TERMINAL_ROOT_PASSWORD=replace-with-a-random-secret-at-least-16-characters
