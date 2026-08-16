@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial terminal-first blog workspace with article browsing, editing, drafts, uploads, authentication, configuration, and command pipelines.
 - Bilingual interface, theme persistence, virtual scrollback, and responsive file drawer.
 - Short `config` virtual path for editing site configuration from the terminal.
+- Configurable first-visit cookie and local-storage consent prompt with persistent `y`, `n`, and `Ctrl+C` handling.
 - Production Docker image and Compose deployment with persistent content and database volumes.
 
 ### Security

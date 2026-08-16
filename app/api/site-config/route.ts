@@ -21,7 +21,12 @@ const siteConfigSchema = z
       .array(z.object({ label: z.string().max(160), href: z.string().url().max(2048) }).strict())
       .max(32)
       .optional(),
-    cookieNotice: z.string().max(1000).optional(),
+    cookieNotice: z
+      .union([
+        z.string().max(1000),
+        z.object({ enable: z.boolean().optional(), message: z.string().max(1000).optional() }).strict(),
+      ])
+      .optional(),
   })
   .strict();
 
