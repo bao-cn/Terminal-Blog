@@ -46,6 +46,13 @@ chore/<topic>      工具链和维护工作
 
 一个分支只解决一个明确问题。不要混入无关格式化、依赖升级或大范围重命名。
 
+版本发布遵循以下顺序：
+
+1. 功能、修复和改进分别通过短生命周期分支合入 `main`，确保 `main` 始终包含最新的可发布代码。
+2. 准备发布时，从最新 `main` 创建 `release/<version>` 分支，例如 `release/0.1.0-beta.1`。
+3. 发布分支只接受版本号、CHANGELOG、发布说明和必要的发布修复。通用代码修复必须先同步到 `main`，再合入发布分支。
+4. 每个版本都要更新 `CHANGELOG.md`，版本号遵循 Semantic Versioning；预发布版本使用 `-alpha.N`、`-beta.N` 或 `-rc.N`。
+
 ### 4. 架构约束
 
 - React 组件负责视图和交互协调，不应直接实现可独立测试的解析、认证或持久化算法。
@@ -169,6 +176,13 @@ chore/<topic>      Tooling and maintenance
 ```
 
 Keep each branch focused on one problem. Avoid unrelated formatting, dependency upgrades, or broad renames.
+
+Use this order for releases:
+
+1. Merge feature, fix, and improvement branches into `main` so it remains the source of the latest releasable code.
+2. When preparing a release, create `release/<version>` from the latest `main`, for example `release/0.1.0-beta.1`.
+3. Release branches accept only version metadata, CHANGELOG updates, release notes, and necessary release fixes. General code fixes must land in `main` first and then be synchronized to the release branch.
+4. Update `CHANGELOG.md` for every release. Versions follow Semantic Versioning, with `-alpha.N`, `-beta.N`, or `-rc.N` suffixes for prereleases.
 
 ### 4. Architecture rules
 
