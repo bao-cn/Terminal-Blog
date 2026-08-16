@@ -6,7 +6,6 @@
 <div align="center">
   <img src="./docs/header.png" style="margin-bottom: 1rem" />
 
-
 [English](./README.en.md) | **简体中文**
 
 ![License](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg) ![Node.js](https://img.shields.io/badge/Node.js-24%2B-339933.svg) ![Next.js](https://img.shields.io/badge/Next.js-16-black.svg) ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg) ![Version](https://img.shields.io/badge/Version-Beta-red.svg)

@@ -19,7 +19,6 @@ jobs:
     env:
       CI: true
       NEXT_TELEMETRY_DISABLED: 1
-      TERMINAL_ROOT_PASSWORD: ci-only-root-password-7f593cca185845d2
 
     steps:
       - name: Check out repository
