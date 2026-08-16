@@ -46,6 +46,7 @@ import { defaultSiteConfig, type SiteConfig } from "@/lib/site-config";
 import { parseFrontmatter, serializeArticleDocument } from "@/lib/article-codec";
 import { splitCommand, splitPipeline } from "@/lib/terminal-command-parser";
 import { runTextPipeline, runTextStage } from "@/lib/terminal-text-pipeline";
+import { isSiteConfigVirtualPath, SITE_CONFIG_VIRTUAL_PATH } from "@/lib/virtual-paths";
 
 const SETTINGS_KEY = "terminal-blog-settings-v1";
 const CONFIG_MD5_KEY = "terminal-blog-config-md5-v1";
@@ -954,7 +955,7 @@ export default function TerminalBlog({
               "Permission denied. nano requires root privileges; use sudo or su root.",
             ),
           );
-        else if (["./system/config", "system/config", "/system/config"].includes(args[0]?.toLowerCase())) {
+        else if (isSiteConfigVirtualPath(args[0])) {
           openEditor({
             mode: "config",
             value: JSON.stringify(siteConfig, null, 2),
@@ -1811,7 +1812,7 @@ export default function TerminalBlog({
                 <NanoEditor
                   fileName={
                     editor.mode === "config"
-                      ? "./system/config"
+                      ? SITE_CONFIG_VIRTUAL_PATH
                       : `${editor.target === "draft" ? "draft/" : ""}${editor.id}.md`
                   }
                   value={editor.mode === "config" ? editor.value : editor.buffer}

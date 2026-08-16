@@ -207,10 +207,10 @@ excerpt: "Article summary"
 默认配置文件为 `config/site.config.json`。root 可以通过虚拟路径编辑站点配置：
 
 ```text
-sudo nano ./system/config
+sudo nano config
 ```
 
-虚拟文件并不实际存在于 `system/config`；读取和保存会映射到 SQLite `system_config`。配置包括：
+虚拟文件并不实际存在于磁盘；读取和保存 `config` 会映射到 SQLite `system_config`。配置包括：
 
 - 博客名称与描述
 - `{BlogName}`、`{ArticleName}` 标题模板
