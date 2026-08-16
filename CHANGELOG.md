@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Bilingual interface, theme persistence, virtual scrollback, and responsive file drawer.
 - Production Docker image and Compose deployment with persistent content and database volumes.
 - Short `config` virtual path for editing site configuration from the terminal.
+- Configurable first-visit cookie and local-storage consent prompt with persistent `y`, `n`, and `Ctrl+C` handling.
 
 ### Security
 
