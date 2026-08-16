@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defaultSiteConfig, mergeSiteConfig } from "../lib/site-config";
+import { defaultSiteConfig, formatSiteTitle, mergeSiteConfig } from "../lib/site-config";
 
 describe("site configuration", () => {
   it("normalizes the cookie notice object", () => {
@@ -18,5 +18,15 @@ describe("site configuration", () => {
       enable: false,
       message: defaultSiteConfig.cookieNotice.message,
     });
+  });
+
+  it("formats configured site and article titles", () => {
+    const config = mergeSiteConfig({
+      blogName: "Example Blog",
+      description: "Example description",
+      titleTemplate: "{ArticleName} :: {BlogName}",
+    });
+    expect(formatSiteTitle(config)).toBe("Example description :: Example Blog");
+    expect(formatSiteTitle(config, "Article title")).toBe("Article title :: Example Blog");
   });
 });
