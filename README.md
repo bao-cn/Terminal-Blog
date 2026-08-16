@@ -76,13 +76,46 @@ Terminal Blog 不是普通网页套一层命令行皮肤，而是把终端作为
 
 以下步骤面向只想运行博客的用户，不要求了解 Next.js 或项目代码。首次部署前，请准备一个用于 root 管理员的高强度密码；不要在生产环境使用默认密码 `root`。
 
+### 选择发布资产
+
+从 [GitHub Releases](https://github.com/bao-cn/Terminal-Blog/releases) 下载时，请根据运行平台和用途选择资产：
+
+| 资产                                                           | 用途                                                                                                                                                                                        |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `terminal-blog-<version>-linux-x64-standalone.tar.gz`          | 已构建的 Linux x64 应用，包含生产构建和运行依赖。仍需安装 Node.js 24 或更高版本，解压后使用 `node server.js` 启动。由于包含 `better-sqlite3` 等原生依赖，不适用于 Windows、macOS 或 ARM64。 |
+| `terminal-blog-<version>-source.zip`                           | 带版本号的源码包，适用于 Windows、Linux、macOS、ARM64、二次定制或本地重新构建。需要依次执行 `npm install`、`npm run build` 和 `npm run start`。                                             |
+| `SHA256SUMS`                                                   | 上述两个自定义发布资产的 SHA-256 校验值，用于检查下载文件是否完整。                                                                                                                         |
+| GitHub 自动生成的 `Source code (zip)` / `Source code (tar.gz)` | GitHub 根据版本标签自动生成的源码归档，用途与自定义 source ZIP 类似，但不包含在项目提供的 `SHA256SUMS` 中。                                                                                 |
+
+Docker 部署不使用 standalone 压缩包；请下载源码包或 GitHub 自动生成的源码归档，其中包含 `Dockerfile` 和 `compose.yaml`。
+
 ### 方式一：手动部署
 
-适用于不使用 Docker、希望直接在 Windows、Linux 或 macOS 上运行的场景。
+#### Linux x64 快速部署
 
-1. 安装 [Node.js 24 或更高版本](https://nodejs.org/)，安装程序会同时提供 npm。
-2. 在 GitHub 仓库中点击 **Code → Download ZIP**，解压到一个固定目录，例如 `terminal-blog`。
-3. 在该目录打开 PowerShell、终端或命令提示符，安装依赖：
+1. 安装 [Node.js 24 或更高版本](https://nodejs.org/)；无需安装 npm 或重新构建项目。
+2. 从 Release 页面下载 `terminal-blog-0.1.0-beta.1-linux-x64-standalone.tar.gz`，然后解压并启动：
+
+   ```bash
+   tar -xzf terminal-blog-0.1.0-beta.1-linux-x64-standalone.tar.gz
+   cd terminal-blog-0.1.0-beta.1-linux-x64-standalone
+   export TERMINAL_ROOT_PASSWORD='your-strong-password'
+   node server.js
+   ```
+
+3. 浏览器打开 <http://localhost:3000>。运行博客的终端窗口需要保持开启；停止服务时按 `Ctrl+C`。
+
+如需在解压前验证下载文件，请把压缩包和 `SHA256SUMS` 放在同一目录后执行：
+
+```bash
+sha256sum -c SHA256SUMS --ignore-missing
+```
+
+#### Windows、macOS、ARM64 或源码部署
+
+1. 从 Release 页面下载 `terminal-blog-<version>-source.zip` 并解压到固定目录，例如 `terminal-blog`。
+2. 安装 [Node.js 24 或更高版本](https://nodejs.org/)，安装程序会同时提供 npm。
+3. 在解压目录打开 PowerShell、终端或命令提示符，安装依赖：
 
    ```bash
    npm install
@@ -125,7 +158,7 @@ data/       SQLite 数据库
 适用于已经安装 Docker Desktop（Windows、macOS）或 Docker Engine 与 Compose v2（Linux）的场景。Docker 会自动处理 Node.js 和原生依赖，推荐普通用户使用此方式。
 
 1. 安装 [Docker Desktop](https://www.docker.com/products/docker-desktop/) 或 Docker Engine，并确认 `docker compose version` 可以正常运行。
-2. 下载并解压项目 ZIP，在项目目录中创建 `.env` 文件：
+2. 下载并解压 `terminal-blog-<version>-source.zip` 或 GitHub 自动生成的源码归档，在项目目录中创建 `.env` 文件：
 
    ```dotenv
    TERMINAL_ROOT_PASSWORD=replace-with-a-random-secret-at-least-16-characters
