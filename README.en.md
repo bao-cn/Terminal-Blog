@@ -34,8 +34,8 @@ guest@terminal.blog:~/systems $ cat packet-garden render
 - [About](#about)
 - [Current Version](#current-version)
 - [Features](#features)
+- [User Deployment](#user-deployment)
 - [Quick Start](#quick-start)
-- [Docker Deployment](#docker-deployment)
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [Technical Overview](#technical-overview)
@@ -72,7 +72,90 @@ See [`CHANGELOG.md`](./CHANGELOG.md) for the complete change history.
 - **Persistent deployment**: a Next.js standalone image and Compose setup persist articles, drafts, attachments, and SQLite data.
 - **Security boundaries**: revocable root sessions, atomic writes, upload signature checks, same-origin validation, body limits, and runtime schemas.
 
+## User Deployment
+
+These steps are for users who only want to run the blog; no knowledge of Next.js or the project code is required. Before the first deployment, prepare a high-entropy password for the root administrator. Do not use the default `root` password in production.
+
+### Option 1: Manual deployment
+
+Use this option when you do not want Docker and plan to run the application directly on Windows, Linux, or macOS.
+
+1. Install [Node.js 24 or newer](https://nodejs.org/); npm is included with the installer.
+2. Click **Code → Download ZIP** in the GitHub repository and extract it to a permanent directory such as `terminal-blog`.
+3. Open PowerShell, a terminal, or Command Prompt in that directory and install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. Set the initial root password. In PowerShell:
+
+   ```powershell
+   $env:TERMINAL_ROOT_PASSWORD = "replace-with-a-random-secret-at-least-16-characters"
+   ```
+
+   On Linux or macOS:
+
+   ```bash
+   export TERMINAL_ROOT_PASSWORD='replace-with-a-random-secret-at-least-16-characters'
+   ```
+
+5. Build and start the production server:
+
+   ```bash
+   npm run build
+   npm run start
+   ```
+
+6. Open <http://localhost:3000> in a browser. Keep the terminal window running; press `Ctrl+C` to stop the service.
+
+The application stores the following content in its working directory. Back them up regularly:
+
+```text
+articles/   published articles
+draft/      drafts
+access/     images and other attachments
+data/       SQLite database
+```
+
+To update a manual installation, back up these directories and press `Ctrl+C` to stop the service. Replace the project files, then run `npm install`, `npm run build`, and `npm run start` again. Do not delete or overwrite the content directories.
+
+### Option 2: Docker deployment
+
+Use this option with Docker Desktop (Windows, macOS) or Docker Engine and Compose v2 (Linux). Docker handles Node.js and native dependencies automatically, so it is the recommended option for most users.
+
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine, then confirm that `docker compose version` works.
+2. Download and extract the project ZIP. Create a `.env` file in the project directory:
+
+   ```dotenv
+   TERMINAL_ROOT_PASSWORD=replace-with-a-random-secret-at-least-16-characters
+   TERMINAL_BLOG_PORT=3000
+   ```
+
+   Keep `.env` on the local machine and never publish the password.
+
+3. Run this command from the project directory:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+4. Open <http://localhost:3000> in a browser. If you changed `TERMINAL_BLOG_PORT`, use that port instead.
+
+Useful management commands:
+
+```bash
+docker compose ps              # show status
+docker compose logs -f         # follow logs; press Ctrl+C to stop viewing
+docker compose stop            # stop containers and keep data
+docker compose up -d --build   # rebuild and restart after an update
+```
+
+Compose stores `articles/`, `draft/`, `access/`, and `data/` in named volumes. `docker compose stop` and container removal preserve the data; `docker compose down -v` deletes the volumes and all articles, attachments, and database contents. Run it only when you intend to erase the site.
+
 ## Quick Start
+
+The following section is for contributors who need to modify code or run the development server.
 
 ### Requirements
 
@@ -109,25 +192,6 @@ draft/      unpublished drafts
 access/     article images and other attachments
 data/       SQLite database
 ```
-
-## Docker Deployment
-
-The production image uses Next.js standalone output. Set a high-entropy password for the initial root credential, then start the service:
-
-```bash
-export TERMINAL_ROOT_PASSWORD='replace-with-a-random-secret-at-least-16-characters'
-docker compose up --build -d
-```
-
-The service listens on <http://localhost:3000> by default. Set `TERMINAL_BLOG_PORT` to change the host port:
-
-```bash
-TERMINAL_BLOG_PORT=8080 docker compose up --build -d
-```
-
-Compose persists `articles/`, `draft/`, `access/`, and `data/`. Removing the container preserves the content; `docker compose down -v` removes the named volumes and their data. Production deployments should place nginx, Caddy, or another reverse proxy in front of the container for TLS and rate limiting.
-
-`TERMINAL_ROOT_PASSWORD` is used only when the database creates the root credential for the first time. Changing the environment variable does not overwrite the stored password.
 
 ## Usage
 

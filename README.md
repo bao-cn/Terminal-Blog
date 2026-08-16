@@ -34,8 +34,8 @@ guest@terminal.blog:~/systems $ cat packet-garden render
 - [关于](#关于)
 - [当前版本](#当前版本)
 - [功能](#功能)
+- [用户部署](#用户部署)
 - [快速开始](#快速开始)
-- [Docker 部署](#docker-部署)
 - [使用指南](#使用指南)
 - [配置](#配置)
 - [技术概览](#技术概览)
@@ -72,7 +72,90 @@ Terminal Blog 不是普通网页套一层命令行皮肤，而是把终端作为
 - **可持久化部署**：提供 Next.js standalone Docker 镜像和 Compose 配置，文章、草稿、附件与 SQLite 数据使用持久化卷。
 - **安全边界**：root session 可撤销，写入采用原子替换，上传校验文件签名，mutation API 具备同源、大小和 Schema 校验。
 
+## 用户部署
+
+以下步骤面向只想运行博客的用户，不要求了解 Next.js 或项目代码。首次部署前，请准备一个用于 root 管理员的高强度密码；不要在生产环境使用默认密码 `root`。
+
+### 方式一：手动部署
+
+适用于不使用 Docker、希望直接在 Windows、Linux 或 macOS 上运行的场景。
+
+1. 安装 [Node.js 24 或更高版本](https://nodejs.org/)，安装程序会同时提供 npm。
+2. 在 GitHub 仓库中点击 **Code → Download ZIP**，解压到一个固定目录，例如 `terminal-blog`。
+3. 在该目录打开 PowerShell、终端或命令提示符，安装依赖：
+
+   ```bash
+   npm install
+   ```
+
+4. 设置首次初始化管理员密码。PowerShell 使用：
+
+   ```powershell
+   $env:TERMINAL_ROOT_PASSWORD = "replace-with-a-random-secret-at-least-16-characters"
+   ```
+
+   Linux 或 macOS 使用：
+
+   ```bash
+   export TERMINAL_ROOT_PASSWORD='replace-with-a-random-secret-at-least-16-characters'
+   ```
+
+5. 创建生产版本并启动：
+
+   ```bash
+   npm run build
+   npm run start
+   ```
+
+6. 浏览器打开 <http://localhost:3000>。运行博客的终端窗口需要保持开启；停止服务时按 `Ctrl+C`。
+
+应用会在运行目录中保存以下内容，请定期备份：
+
+```text
+articles/   已发布文章
+draft/      草稿
+access/     图片和其他附件
+data/       SQLite 数据库
+```
+
+更新手动部署时，先备份上述目录并按 `Ctrl+C` 停止服务，再替换项目文件，重新执行 `npm install`、`npm run build` 和 `npm run start`。不要删除或覆盖这些内容目录。
+
+### 方式二：Docker 部署
+
+适用于已经安装 Docker Desktop（Windows、macOS）或 Docker Engine 与 Compose v2（Linux）的场景。Docker 会自动处理 Node.js 和原生依赖，推荐普通用户使用此方式。
+
+1. 安装 [Docker Desktop](https://www.docker.com/products/docker-desktop/) 或 Docker Engine，并确认 `docker compose version` 可以正常运行。
+2. 下载并解压项目 ZIP，在项目目录中创建 `.env` 文件：
+
+   ```dotenv
+   TERMINAL_ROOT_PASSWORD=replace-with-a-random-secret-at-least-16-characters
+   TERMINAL_BLOG_PORT=3000
+   ```
+
+   `.env` 只保存在本机，不要提交或公开其中的密码。
+
+3. 在项目目录执行：
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+4. 浏览器打开 <http://localhost:3000>。如果修改了 `TERMINAL_BLOG_PORT`，请访问对应端口。
+
+常用管理命令：
+
+```bash
+docker compose ps              # 查看运行状态
+docker compose logs -f         # 查看实时日志，按 Ctrl+C 退出日志查看
+docker compose stop            # 停止容器，保留数据
+docker compose up -d --build   # 更新镜像并重新启动
+```
+
+Compose 会把 `articles/`、`draft/`、`access/` 和 `data/` 保存到命名卷中。`docker compose stop` 或删除容器不会删除数据；`docker compose down -v` 会删除命名卷及其中的所有文章、附件和数据库，只有在确认要清空站点时才执行。
+
 ## 快速开始
+
+以下内容面向需要修改代码、运行开发服务器的贡献者。
 
 ### 环境要求
 
@@ -109,25 +192,6 @@ draft/      未发布的草稿
 access/     文章图片和其他附件
 data/       SQLite 数据库
 ```
-
-## Docker 部署
-
-项目使用 Next.js standalone 输出构建生产镜像。设置首次初始化 root 凭据所需的高强度密码后启动：
-
-```bash
-export TERMINAL_ROOT_PASSWORD='replace-with-a-random-secret-at-least-16-characters'
-docker compose up --build -d
-```
-
-服务默认监听 <http://localhost:3000>，可以通过 `TERMINAL_BLOG_PORT` 修改宿主机端口：
-
-```bash
-TERMINAL_BLOG_PORT=8080 docker compose up --build -d
-```
-
-Compose 会持久化 `articles/`、`draft/`、`access/` 和 `data/`。删除容器不会删除这些内容；只有 `docker compose down -v` 才会删除命名卷及其中的数据。生产环境应在容器前配置 nginx、Caddy 等反向代理来处理 TLS 和请求限速。
-
-`TERMINAL_ROOT_PASSWORD` 只在数据库第一次创建 root 凭据时生效。修改环境变量不会覆盖已经保存的密码。
 
 ## 使用指南
 
