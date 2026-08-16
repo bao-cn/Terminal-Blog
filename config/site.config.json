@@ -6,8 +6,8 @@
   "favicon": "/favicon.svg",
   "sourceFallback": "public.gateway",
   "filings": {
-    "icp": "ICP备案号：待配置",
-    "police": "公安备案号：待配置"
+    "icp": "陇ICP备2022000263号-1",
+    "police": "甘公网安备62011102000239号"
   },
   "friendlyLinks": [
     { "label": "Maple Font", "href": "https://github.com/subframe7536/Maple-font" },
