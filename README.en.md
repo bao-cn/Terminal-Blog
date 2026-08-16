@@ -1,180 +1,246 @@
 <div align="center">
-  <img src="./public/favicon.svg" width="32" />
-  <h1 style="margin-top: 0">Terminal Blog</h1>
+  <img src="./public/favicon.svg" width="48" alt="Terminal Blog logo" />
+  <h1>Terminal Blog</h1>
+  <p>A blog system where the terminal is the primary interface.</p>
+
+  <p>
+    <strong>English</strong> | <a href="./README.md">简体中文</a>
+  </p>
+
+  <p>
+    <a href="https://github.com/bao-cn/Terminal-Blog/actions/workflows/ci.yml"><img src="https://github.com/bao-cn/Terminal-Blog/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status" /></a>
+    <img src="https://img.shields.io/badge/version-0.1.0--beta.1-e05252" alt="Version 0.1.0-beta.1" />
+    <img src="https://img.shields.io/badge/Node.js-24%2B-339933" alt="Node.js 24 or newer" />
+    <img src="https://img.shields.io/badge/Next.js-16-111111" alt="Next.js 16" />
+    <a href="./LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0--only-2f80ed" alt="GPL-3.0-only license" /></a>
+  </p>
 </div>
 
-<div align="center">
-  <img src="./docs/header.png" style="margin-bottom: 1rem" />
+<p align="center">
+  <img src="./docs/header.png" alt="Terminal Blog terminal workspace" />
+</p>
 
-**English** | [简体中文](./README.md)
+Terminal Blog maps articles, categories, drafts, attachments, configuration, and administration to a Unix-like file and command model. Visitors read Markdown as if they were browsing a filesystem; administrators can edit, publish, and maintain the site from the terminal.
 
-![License](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg) ![Node.js](https://img.shields.io/badge/Node.js-24%2B-339933.svg) ![Next.js](https://img.shields.io/badge/Next.js-16-black.svg) ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg) ![Version](https://img.shields.io/badge/Version-Beta-red.svg)
-</div>
-
-Terminal Blog is a blog system whose primary interface is an actual terminal workspace. It does not place a command-line theme around a conventional web page. Articles, categories, drafts, attachments, configuration, and administrative operations are exposed through a Unix-like filesystem and command model.
-
-Visitors browse with `ls`, `cd`, `cat`, `less`, `head`, `tail`, `grep`, and pipelines. Administrators use `su root` or `sudo` together with an in-terminal `nano` editor, draft management, uploads, moves, and removals.
-
-```shell
-Terminal Blog Shell 2.6.0 (tty/07)
-Copyright (c) 2026 Terminal Blog. All signals preserved.
-Last login: Fri Aug 15 04:42:07 from public.gateway
-
+```text
 guest@terminal.blog:~ $ cd systems
 guest@terminal.blog:~/systems $ ls
 -r--r--r-- 2026-08-12  6 min packet-garden.md
 guest@terminal.blog:~/systems $ cat packet-garden render
 ```
 
-## Why Terminal Blog
+## Contents
 
-Terminal Blog is designed for two audiences at once. Experienced terminal users get a continuous, composable workflow, while visitors unfamiliar with command-line tools still receive prediction, completion, parameter hints, help output, and an optional collapsible file tree.
+- [About](#about)
+- [Current Version](#current-version)
+- [Features](#features)
+- [User Deployment](#user-deployment)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Technical Overview](#technical-overview)
+- [Development](#development)
+- [Contributing and Releases](#contributing-and-releases)
+- [Changelog](./CHANGELOG.md)
+- [License](#license)
 
-| Design                       | Implementation and benefit                                                                                                       |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Terminal-only workspace      | There is no traditional header, footer, or fixed command bar. The prompt remains at the end of the scrollback buffer             |
-| Composable commands          | A central registry generates help, argument descriptions, and completions; text commands support pipelines such as `cat \| grep` |
-| Large-buffer performance     | TanStack Virtual mounts only visible output entries plus a small overscan window                                                 |
-| On-demand CJK font loading   | Maple Mono is split into 46 `unicode-range` WOFF2 files, so the browser downloads only glyph ranges used on the page             |
-| In-terminal editing          | `nano` and `less` use an alternate-screen model and restore scrollback when closed instead of opening web modals                 |
-| Files and index are separate | Markdown files remain the source of truth; SQLite indexes metadata without duplicating article bodies                            |
-| Safer Markdown               | React Markdown disables raw HTML, Remark GFM adds common extensions, and Shiki is loaded dynamically for dual-theme highlighting |
-| Revocable authentication     | Root sessions are stored server-side with password versions and revocation instead of non-revocable signed tokens                |
-| Deployment configuration     | Blog identity, title templates, links, filing records, icons, and the cookie notice share one configuration model                |
+## About
 
-## Terminal Experience
+Terminal Blog is not a command-line skin around a conventional webpage. The terminal is the workspace: command output goes into a scrollback buffer, input stays at its end, and `nano` and `less` use alternate screens that restore the previous reading position when they close.
 
-### Input model
+The project is designed for visitors who enjoy a continuous, composable reading flow, while command menus, completion, help text, and a collapsible file tree keep the experience approachable.
 
-- `/` opens the command menu, single-letter input predicts commands, `Tab` completes, and arrow keys navigate suggestions and history.
-- `Insert` switches between insert and overwrite cursor modes.
-- Password input echoes neither characters nor password length.
-- Terminal-style copy and paste use `Ctrl+Shift+C`, `Ctrl+Shift+V`, and middle-click paste.
-- A custom context menu provides copy, paste, paste selection, select all, and clear.
-- `clear` recreates the session output while preserving the boot copyright text and a fresh prompt.
+## Current Version
 
-### Virtual scrollback
+`0.1.0-beta.1` is the current baseline release and includes:
 
-The scrollback uses `@tanstack/react-virtual` with stable entry IDs, live DOM height measurement, an initial estimate of roughly `52px`, and `8` overscan items.
+- A Next.js standalone Docker image and a Compose deployment with persistent volumes.
+- The shorter `config` virtual path, configurable title templates, and synchronized site metadata.
+- A first-visit local-storage prompt controlled by `enable`, with `y`, `n`, and `Ctrl+C` handling.
+- Terminal reading, article administration, drafts, uploads, authentication, and composable command pipelines.
 
-As command history, Markdown, screenfetch data, and article output grow, the browser does not keep every output node mounted. Only entries around the viewport are rendered. The prompt can still remain at the logical end of the buffer, and closing `nano` or `less` restores the previous scroll position.
+See [`CHANGELOG.md`](./CHANGELOG.md) for the complete change history.
 
-### Maple Mono Unicode sharding
+## Features
 
-The full Maple Mono CJK font is too large for a smooth first load. Terminal Blog splits it into 46 WOFF2 resources:
+- **Terminal-first reading**: `ls`, `cd`, `cat`, `less`, `head`, `tail`, `grep`, `search`, and text pipelines.
+- **In-terminal administration**: root sessions, `nano`, draft lifecycle, uploads, moves, deletion, and password changes.
+- **Markdown content**: frontmatter, GFM tables and task lists, Shiki syntax highlighting, and article attachments.
+- **Large scrollback without DOM growth**: TanStack Virtual renders the visible output around the viewport.
+- **Bilingual experience**: language, theme, and terminal preferences persist in browser localStorage; Maple Mono loads by Unicode shard.
+- **Configurable identity**: blog name, title templates, links, filing records, favicon, and the first-visit local-storage notice share one site configuration.
+- **Persistent deployment**: a Next.js standalone image and Compose setup persist articles, drafts, attachments, and SQLite data.
+- **Security boundaries**: revocable root sessions, atomic writes, upload signature checks, same-origin validation, body limits, and runtime schemas.
 
-- The ASCII shard is about 34 KB and is preloaded during application startup.
-- Latin Extended, symbols, CJK punctuation, and full-width characters use separate shards.
-- CJK Unified Ideographs are divided into ranges of roughly 512 code points, such as `U+4E00-4FFF` and `U+5000-51FF`.
-- All shards total about 6.4 MB, but a browser requests only ranges required by characters currently rendered.
+## User Deployment
 
-Declarations live in [`app/maple-mono.css`](./app/maple-mono.css), while the WOFF2 files live under `public/fonts/maple-mono/`. This avoids loading the entire font before first paint while preserving consistent Chinese and Latin typography.
+These steps are for users who only want to run the blog; no knowledge of Next.js or the project code is required. Before the first deployment, prepare a high-entropy password for the root administrator. Do not use the default `root` password in production.
 
-### Markdown and syntax highlighting
+### Option 1: Manual deployment
 
-- `react-markdown` renders React output without a Vue or external rendering runtime.
-- `remark-gfm` adds tables, strikethrough, task lists, and autolinks.
-- `skipHtml` prevents raw article HTML from being rendered.
-- The Shiki Web Bundle is dynamically imported only when a fenced code block is present.
-- Shiki generates both `github-light` and `github-dark` colors and follows the terminal theme.
-- Images are lazy-loaded, and safe relative article paths can resolve into the whitelisted `access/` directory.
+Use this option when you do not want Docker and plan to run the application directly on Windows, Linux, or macOS.
 
-## Technology Stack
+1. Install [Node.js 24 or newer](https://nodejs.org/); npm is included with the installer.
+2. Click **Code → Download ZIP** in the GitHub repository and extract it to a permanent directory such as `terminal-blog`.
+3. Open PowerShell, a terminal, or Command Prompt in that directory and install dependencies:
 
-| Layer          | Technology                               |
-| -------------- | ---------------------------------------- |
-| Web framework  | Next.js 16 App Router, React 19          |
-| Language       | TypeScript 5 with `strict: true`         |
-| UI and styling | Tailwind CSS 4, native CSS, Lucide React |
-| Virtualization | TanStack React Virtual                   |
-| Markdown       | React Markdown, Remark GFM, Shiki        |
-| Database       | SQLite, better-sqlite3, WAL              |
-| Validation     | Zod 4                                    |
-| Quality        | ESLint 9, Prettier 3, Vitest 3           |
+   ```bash
+   npm install
+   ```
+
+4. Set the initial root password. In PowerShell:
+
+   ```powershell
+   $env:TERMINAL_ROOT_PASSWORD = "replace-with-a-random-secret-at-least-16-characters"
+   ```
+
+   On Linux or macOS:
+
+   ```bash
+   export TERMINAL_ROOT_PASSWORD='replace-with-a-random-secret-at-least-16-characters'
+   ```
+
+5. Build and start the production server:
+
+   ```bash
+   npm run build
+   npm run start
+   ```
+
+6. Open <http://localhost:3000> in a browser. Keep the terminal window running; press `Ctrl+C` to stop the service.
+
+The application stores the following content in its working directory. Back them up regularly:
+
+```text
+articles/   published articles
+draft/      drafts
+access/     images and other attachments
+data/       SQLite database
+```
+
+To update a manual installation, back up these directories and press `Ctrl+C` to stop the service. Replace the project files, then run `npm install`, `npm run build`, and `npm run start` again. Do not delete or overwrite the content directories.
+
+### Option 2: Docker deployment
+
+Use this option with Docker Desktop (Windows, macOS) or Docker Engine and Compose v2 (Linux). Docker handles Node.js and native dependencies automatically, so it is the recommended option for most users.
+
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine, then confirm that `docker compose version` works.
+2. Download and extract the project ZIP. Create a `.env` file in the project directory:
+
+   ```dotenv
+   TERMINAL_ROOT_PASSWORD=replace-with-a-random-secret-at-least-16-characters
+   TERMINAL_BLOG_PORT=3000
+   ```
+
+   Keep `.env` on the local machine and never publish the password.
+
+3. Run this command from the project directory:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+4. Open <http://localhost:3000> in a browser. If you changed `TERMINAL_BLOG_PORT`, use that port instead.
+
+Useful management commands:
+
+```bash
+docker compose ps              # show status
+docker compose logs -f         # follow logs; press Ctrl+C to stop viewing
+docker compose stop            # stop containers and keep data
+docker compose up -d --build   # rebuild and restart after an update
+```
+
+Compose stores `articles/`, `draft/`, `access/`, and `data/` in named volumes. `docker compose stop` and container removal preserve the data; `docker compose down -v` deletes the volumes and all articles, attachments, and database contents. Run it only when you intend to erase the site.
 
 ## Quick Start
+
+The following section is for contributors who need to modify code or run the development server.
 
 ### Requirements
 
 - Node.js 24 or newer
 - npm 10 or newer
 - Windows, Linux, or macOS
-- Native module support for `better-sqlite3`; common platforms normally use a prebuilt binary
+- Native module support for `better-sqlite3` (common platforms normally use a prebuilt binary)
 
-### Install and run
+### Run locally
 
 ```bash
-git clone <your-fork-url>
-cd terminal_blog
+git clone https://github.com/bao-cn/Terminal-Blog.git
+cd Terminal-Blog
 npm install
 npm run dev
 ```
 
-Open <http://localhost:3000>.
+Open <http://localhost:3000>. When the database is created for the first time without `TERMINAL_ROOT_PASSWORD`, the initial administrator credentials are `root` / `root`. Use this default only for local development.
 
-### Production build
+For a production build:
 
 ```bash
 npm run build
 npm run start
 ```
 
-A production deployment needs persistent volumes for `articles/`, `draft/`, `access/`, and `data/`. An ephemeral container without those volumes will lose content, uploads, or database state during redeployment.
+### Content directories
 
-## Default Administrator and Security Warning
-
-When the database is created for the first time without `TERMINAL_ROOT_PASSWORD`, the initial credentials are:
+The following directories can be prepared before starting the application and are ignored by Git by default:
 
 ```text
-username: root
-password: root
+articles/   published Markdown articles
+draft/      unpublished drafts
+access/     article images and other attachments
+data/       SQLite database
 ```
 
-Enter a privileged session:
+## Usage
+
+### Visitor commands
+
+| Command                          | Purpose                                           |
+| -------------------------------- | ------------------------------------------------- |
+| `help` / `man`                   | Show generated help                               |
+| `ls [limit] [page]`              | List categories or paginated articles             |
+| `cd [category\|..\|/]`           | Change article category                           |
+| `cat <article> [render\|source]` | Render an article or print Markdown source        |
+| `less <article>`                 | Read in an alternate screen; press `Q` to exit    |
+| `head` / `tail`                  | Read the beginning or end of an article           |
+| `grep <query> [article]`         | Search an article or piped input                  |
+| `search`                         | Search by title, pinyin, tags, category, and date |
+| `stat <article>`                 | Show complete metadata                            |
+| `history` / `clear`              | Manage the session scrollback                     |
+| `theme [auto\|light\|dark]`      | Change the theme                                  |
+| `lang [zh\|en]`                  | Change the interface language                     |
+| `drawer` / `tree`                | Expand or collapse the file tree                  |
+
+Commands can be composed with pipelines:
 
 ```text
-su root
+cat packet-garden source | grep network
+head -n 30 packet-garden | grep latency
+tail -c 512 packet-garden | grep signal
 ```
 
-Run one elevated command:
+Type `/` to open the command menu, press `Tab` for completion, and use the arrow keys to navigate suggestions and history. `Ctrl+Shift+C`, `Ctrl+Shift+V`, and middle-click provide terminal-style copy and paste.
+
+### Administrator commands
 
 ```text
-sudo nano article.md
+su root                         enter a root session
+sudo <command>                  authenticate and run one root command
+nano <article>                  create or edit an article
+draft new|list|edit|publish|rm  manage drafts
+mkdir <category>                create a top-level category
+mv <article> <category>         move an article
+rm <article>                    remove an article and its index entry
+upload <file> <target_path>     upload Markdown or an attachment
+passwd                          change the password and revoke old sessions
+email [address]                 read or update the contact email
 ```
 
-Use `passwd` after logging in. Production deployments must set a high-entropy password before the first startup:
+### Article format
 
-```bash
-TERMINAL_ROOT_PASSWORD=replace-with-a-random-secret-at-least-16-characters
-```
-
-The default `root` password is for local initialization only and is not production-safe.
-
-Authentication includes:
-
-- Asynchronous `scrypt` password hashing to avoid blocking the Node.js event loop.
-- Per-IP and global login limits with exponential backoff.
-- Random opaque session tokens with only SHA-256 digests stored in SQLite.
-- Expiration, revocation, password-version, and future-time checks.
-- Password changes revoke every previous session.
-- HttpOnly and SameSite=Strict cookies, with Secure added in production.
-- Same-origin mutation checks, body limits, Content-Type validation, and Zod runtime schemas.
-
-## Content Model
-
-### Articles
-
-Articles live one category deep under `articles/<category>/`:
-
-```text
-articles/
-  systems/
-    packet-garden.md
-  field-notes/
-    local-first-sunday.md
-```
-
-Each Markdown file uses frontmatter:
+Articles live under `articles/<category>/`, with at most one category level. The Markdown file is the source of truth; SQLite stores metadata for lists and search:
 
 ```markdown
 ---
@@ -183,48 +249,29 @@ slug: example-article
 date: 2026-08-15
 readTime: 5 min
 tags: [terminal, nextjs]
-pinyin: example article
 excerpt: "Article summary"
 ---
 
 # Article body
-
-![Architecture](../../access/architecture.png)
 ```
 
-Article bodies remain exclusively in Markdown. The SQLite `article_index` table stores slug, title, category, date, reading time, tags, pinyin, and source path. A full index synchronization removes records whose files no longer exist.
+Store images and other attachments under `access/` and reference them with a relative path such as `../../access/architecture.png`.
 
-### Drafts and attachments
+## Configuration
 
-- `draft/` stores unpublished Markdown drafts.
-- `access/` stores article images.
-- `upload` can write only to whitelisted `articles/` and `access/` paths.
-- Attachment uploads validate extension, MIME type, and real file signature.
-- File changes use same-directory temporary files, `fsync`, and atomic replacement so failed writes preserve the previous file.
-
-### Site configuration
-
-The initial configuration lives in `config/site.config.json`. Root can edit the mapped virtual system file:
+The initial site configuration lives in [`config/site.config.json`](./config/site.config.json). Root can edit it through the shorter virtual path:
 
 ```text
 sudo nano config
 ```
 
-`config` is not a real file on disk. Its reads and writes are mapped to SQLite `system_config`. The configuration controls:
-
-- Blog name and description
-- `{BlogName}` and `{ArticleName}` title templates
-- Favicon
-- Contact email
-- ICP and public-security filing text
-- Friendly links
-- Cookie / local-storage notice toggle and message
-- Source-address fallback label
-
-The cookie notice uses this structure:
+`config` is virtual and is not written as a file on disk; reads and writes map to SQLite's `system_config` record. Common settings look like this:
 
 ```json
 {
+  "blogName": "terminal.blog",
+  "description": "Field notes from the command line.",
+  "titleTemplate": "{BlogName} | {ArticleName}",
   "cookieNotice": {
     "enable": true,
     "message": "This site stores language, theme, and terminal preferences locally."
@@ -232,149 +279,40 @@ The cookie notice uses this structure:
 }
 ```
 
-When enabled, a visitor without a stored choice sees the notice at the end of the scrollback on first entry. Enter `y` to accept, or enter `n` / press `Ctrl+C` to decline. The choice is stored in localStorage so later visits do not repeat the prompt. Legacy string values for `cookieNotice` remain readable and are treated as enabled.
+- `titleTemplate` supports `{BlogName}` and `{ArticleName}`. It drives server metadata and the browser tab; before an article is opened, `{ArticleName}` uses the site description, and after an article is opened it uses the article title.
+- `cookieNotice.enable` controls the first-visit prompt. When enabled and no localStorage choice exists, the notice is appended to the end of the scrollback; enter `y` to accept, or `n` / `Ctrl+C` to decline. The choice is stored and the prompt is not shown again.
+- The site configuration also supports the favicon, contact email, friendly links, ICP / public-security filing text, and a source-address fallback label.
 
-The title template drives both server metadata and the browser tab title. Before an article is opened, `{ArticleName}` uses the site `description`; after `cat` or `less` opens an article, it uses that article's title. `{BlogName}` always uses the current blog name.
+Environment variables:
 
-## Command System
+| Variable                 | Default        | Description                                                                           |
+| ------------------------ | -------------- | ------------------------------------------------------------------------------------- |
+| `TERMINAL_ROOT_PASSWORD` | `root`         | Used only when the root credential is first created; set a strong value in production |
+| `TERMINAL_BLOG_PORT`     | `3000`         | Host port in Compose                                                                  |
+| `NODE_ENV`               | Set by Next.js | Controls Secure cookies, HSTS, and development CSP                                    |
 
-### Visitor commands
+## Technical Overview
 
-| Command                          | Purpose                                                     |
-| -------------------------------- | ----------------------------------------------------------- |
-| `help` / `man`                   | Show help generated from the command registry               |
-| `ls [limit] [page]`              | List categories or paginated articles                       |
-| `cd [category\|..\|/]`           | Change article category                                     |
-| `cat <article> [render\|source]` | Render Markdown or print its source                         |
-| `less <article>`                 | Open the alternate-screen pager; press `Q` to exit          |
-| `head` / `tail`                  | Read the beginning or end by lines or bytes                 |
-| `grep <query> [article]`         | Search an article or piped input                            |
-| `search`                         | Search by title, pinyin, initials, tags, category, and date |
-| `stat <article>`                 | Print complete metadata                                     |
-| `history` / `clear`              | Manage the terminal scrollback session                      |
-| `theme [auto\|light\|dark]`      | Change the color theme                                      |
-| `lang [zh\|en]`                  | Change UI language without translating command names        |
-| `drawer` / `tree`                | Expand or collapse the helper file tree                     |
-| `screenfetch`                    | Print browser, engine, GPU, memory, and device information  |
-
-Text commands support pipelines:
-
-```text
-cat packet-garden source | grep network
-head -n 30 packet-garden | grep latency
-tail -c 512 packet-garden | grep signal
-```
-
-### Administrator commands
-
-| Command                              | Purpose                                          |
-| ------------------------------------ | ------------------------------------------------ |
-| `su root` / `exit`                   | Enter or leave a root session                    |
-| `sudo <command>`                     | Authenticate and run one command as root         |
-| `nano <article>`                     | Create or edit an article inside the terminal    |
-| `draft new\|list\|edit\|publish\|rm` | Manage the draft lifecycle                       |
-| `mkdir <category>`                   | Create a top-level category                      |
-| `mv <article> <category>`            | Move an article                                  |
-| `rm <article>`                       | Remove an article and its index entry            |
-| `upload <file> <target_path>`        | Upload Markdown or an image                      |
-| `passwd`                             | Change the root password and revoke old sessions |
-| `email [address]`                    | Read or update the contact email                 |
-
-Fun commands include `cmatrix`, `hollywood`, `cbonsai`, `cowsay`, and `nyancat`. Their output is appended directly to the scrollback like every other terminal command.
-
-### Adding a command
-
-1. Register the command, aliases, permissions, and argument definitions in `lib/command-registry.ts`.
-2. Put pure parsing or text processing in `lib/terminal-command-parser.ts` or another focused domain module.
-3. Connect stateful React or API behavior in the terminal controller.
-4. Add Vitest coverage for validation, aliases, pipelines, or output behavior.
-5. `help`, the command palette, and parameter hints automatically consume the registry; do not maintain a second hard-coded help list.
-
-## Architecture
+| Layer       | Technology                                         |
+| ----------- | -------------------------------------------------- |
+| Web         | Next.js 16 App Router, React 19, TypeScript strict |
+| Styling     | Tailwind CSS 4, native CSS, Lucide React           |
+| Content     | React Markdown, Remark GFM, Shiki                  |
+| Interaction | TanStack React Virtual                             |
+| Data        | SQLite, better-sqlite3, WAL                        |
+| Quality     | ESLint 9, Prettier 3, Vitest 3                     |
 
 ```mermaid
-flowchart TD
-  B["Browser / Terminal UI"] --> P["Next.js App Router"]
-  B --> C["Command registry, parser and pipeline"]
-  P --> R["Route Handlers"]
-  R --> S["Request security and Zod schemas"]
-  S --> A["Auth store"]
-  S --> AS["Article / draft / upload stores"]
-  S --> CS["Config store"]
-  AS --> F["Markdown and access filesystem"]
-  AS --> I["Article metadata index"]
-  A --> D["SQLite"]
-  I --> D
-  CS --> D
+flowchart LR
+  UI[Terminal workspace] --> Commands[Command registry and pipelines]
+  UI --> Routes[Next.js Route Handlers]
+  Routes --> Security[Authentication and request checks]
+  Security --> Stores[Article, draft, upload, and config stores]
+  Stores --> Files[Markdown and attachments]
+  Stores --> SQLite[(SQLite)]
 ```
 
-### Layer responsibilities
-
-| Layer               | Main files                                                                                  | Responsibility                                                                  |
-| ------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Entry points        | `app/page.tsx`, `app/layout.tsx`                                                            | SSR data, metadata, global font preload                                         |
-| Terminal workspace  | `components/TerminalBlog.tsx`                                                               | Session state, command dispatch, scrollback, and Drawer coordination            |
-| Terminal components | `components/terminal/*`                                                                     | Prompt, Markdown, nano, less, screenfetch, context menu                         |
-| Command domain      | `command-registry.ts`, `terminal-command-parser.ts`, `terminal-text-pipeline.ts`            | Registration, completion, argument rules, pipeline parsing, pure text execution |
-| API boundary        | `request-security.ts`, `api-schemas.ts`                                                     | Origin checks, limits, Content-Type, errors, runtime schemas                    |
-| Data access         | `auth-store.ts`, `article-store.ts`, `draft-store.ts`, `upload-store.ts`, `config-store.ts` | Domain-specific persistence and authorization boundaries                        |
-| Persistence         | `database.ts`, `article-index-store.ts`, `atomic-file.ts`                                   | SQLite migrations, metadata indexing, atomic file updates                       |
-
-### Request and state flow
-
-1. Every page request reads current site configuration, articles, categories, and attachments on the server.
-2. The client stores only theme, language, the cookie-notice choice, and configuration MD5 in localStorage. Articles are never restored from localStorage; server data remains authoritative.
-3. Mutation requests pass origin, authentication, size, Content-Type, and Zod checks.
-4. Successful filesystem changes synchronize the SQLite metadata index.
-5. Client article state changes only after server confirmation, avoiding irreversible optimistic updates.
-
-## Project Structure
-
-```text
-app/                      Next.js pages, APIs, and global styles
-  api/                    auth, articles, drafts, upload, config
-  maple-mono.css          46 Unicode-range font declarations
-components/
-  terminal/               Reusable terminal views and alternate screens
-lib/
-  command-registry.ts     Commands, arguments, and generated help
-  terminal-*.ts           Parsing and testable pipeline execution
-  *-store.ts              Domain-specific data access
-  request-security.ts     Request security boundary
-  database.ts             SQLite schema and migrations
-public/fonts/maple-mono/  WOFF2 font shards
-articles/                 Published content, ignored by Git
-draft/                    Draft content, ignored by Git
-access/                   Article assets
-data/                     SQLite data, ignored by Git
-config/                   Initial site configuration
-tests/                    Vitest unit tests
-.github/                  CI, Issue Forms, and PR template
-```
-
-## Configuration and Environment
-
-| Variable                 | Required       | Default       | Description                                         |
-| ------------------------ | -------------- | ------------- | --------------------------------------------------- |
-| `TERMINAL_ROOT_PASSWORD` | No             | `root`        | Used only when the root credential is first created |
-| `NODE_ENV`               | Set by Next.js | `development` | Controls Secure cookies, HSTS, and development CSP  |
-
-Site configuration is not statically cached by Next.js. Requests read SQLite or the initial JSON and generate an MD5 fingerprint that lets the client detect configuration changes.
-
-## Docker Deployment
-
-The production image uses Next.js standalone output. Set a high-entropy password for the initial root credential, then start the service:
-
-```bash
-export TERMINAL_ROOT_PASSWORD='replace-with-a-random-secret-at-least-16-characters'
-docker compose up --build -d
-```
-
-The service listens on `http://localhost:3000` by default. Set `TERMINAL_BLOG_PORT` to change the host port. Compose uses named volumes for `articles/`, `draft/`, `access/`, and `data/`; removing the container preserves them, while `docker compose down -v` also removes the volumes and their data.
-
-Production deployments should place nginx, Caddy, or another reverse proxy in front of the container for TLS, rate limiting, and malformed or slow connections. `TERMINAL_ROOT_PASSWORD` is used only when the database creates the root credential for the first time; changing it later does not overwrite the stored password.
-
-## Development and Quality Checks
+## Development
 
 ```bash
 npm run lint
@@ -384,47 +322,19 @@ npx prettier --check .
 npm run build
 ```
 
-Tests cover frontmatter, API schemas, body and origin policy, session timing, command registration, and pipeline execution. New work should add unit or Route Handler integration coverage proportional to its risk.
+New commands belong in `lib/command-registry.ts`. Put parsing and text processing in `lib/terminal-command-parser.ts` or a focused domain module, and add Vitest coverage for validation, aliases, pipelines, and output.
 
-## Contribution Workflow
+## Contributing and Releases
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full policy. The standard flow is:
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the complete policy. The essential workflow is:
 
-1. Search existing Issues before opening a new report or proposal.
-2. Use the Bug Report form for reproducible defects and the Feature Request form for terminal semantics or workflow proposals.
-3. Fork the repository and branch from the latest default branch using `fix/<topic>`, `feat/<topic>`, `docs/<topic>`, or `refactor/<topic>`.
-4. Install dependencies and run the existing checks before changing code.
-5. Keep changes focused. Never commit `articles/`, `draft/`, `data/`, local environment files, or Agent instruction files.
-6. New commands must use the command registry instead of a separate hard-coded help list.
-7. Run every quality command and verify the main terminal workflow at `http://localhost:3000`.
-8. Prefer Conventional Commits, for example `feat(commands): add wc command`.
-9. A Pull Request must explain motivation, implementation, risk, verification, and visible UI changes. Include screenshots or recordings for visual work.
-10. Address review feedback with additional commits and merge only after CI passes and discussions are resolved.
+1. Create a focused `feat/`, `fix/`, `docs/`, or `refactor/` branch from the latest `main`.
+2. Implement and verify the change on that branch, using Conventional Commits.
+3. Open a Pull Request from the feature branch to `main`; maintainers review and merge it manually.
+4. When releasing, create `release/<version>` from the latest `main`; synchronize release fixes back to `main` first.
 
-Do not open a public Issue containing exploit details, passwords, tokens, or real user data. Use GitHub Private vulnerability reporting from the repository Security page.
-
-## GitHub Automation
-
-- `CI` runs Prettier, ESLint, TypeScript, Vitest, and a production build for pushes and Pull Requests.
-- `Dependency Review` checks newly introduced dependencies for known vulnerabilities and license risk.
-- Issue Forms collect reproducible environment and motivation details.
-- The Pull Request template requires verification, risk, and visual-change information.
-
-## Backups
-
-Git ignores articles, drafts, and database files. Back up at least:
-
-```text
-articles/
-draft/
-access/
-data/terminal-blog.sqlite
-```
-
-SQLite runs in WAL mode. For online backups, use the SQLite backup API or include the `-wal` and `-shm` files. The safest approach is to stop writes before copying data.
+Do not commit articles, drafts, databases, local environment variables, or Agent instruction files. Do not disclose exploit details in public issues; use Private vulnerability reporting from the repository Security page.
 
 ## License
 
-Terminal Blog is released under the [GNU General Public License v3.0 only](./LICENSE).
-
-Maple Mono is distributed under its own license. See [`public/fonts/maple-mono/LICENSE.txt`](./public/fonts/maple-mono/LICENSE.txt).
+Terminal Blog is released under the [GNU General Public License v3.0 only](./LICENSE). Maple Mono is distributed under its own license; see [`public/fonts/maple-mono/LICENSE.txt`](./public/fonts/maple-mono/LICENSE.txt).
