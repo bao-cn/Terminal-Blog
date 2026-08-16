@@ -359,6 +359,19 @@ tests/                    Vitest 单元测试
 
 站点内容配置不使用 Next.js 静态缓存。页面请求会读取 SQLite 或初始 JSON，并生成 MD5 供客户端判断配置是否发生变化。
 
+## Docker 部署
+
+项目使用 Next.js standalone 输出构建生产镜像。先设置首次初始化 root 凭据所需的高强度密码，再启动服务：
+
+```bash
+export TERMINAL_ROOT_PASSWORD='replace-with-a-random-secret-at-least-16-characters'
+docker compose up --build -d
+```
+
+默认监听 `http://localhost:3000`。可通过 `TERMINAL_BLOG_PORT` 修改宿主机端口。Compose 使用命名卷持久化 `articles/`、`draft/`、`access/` 和 `data/`；删除容器不会删除这些内容，执行 `docker compose down -v` 才会移除卷和其中的数据。
+
+生产环境应在容器前部署 nginx、Caddy 等反向代理，并由代理处理 TLS、请求限速和异常连接。`TERMINAL_ROOT_PASSWORD` 只在数据库首次创建 root 凭据时生效，之后修改环境变量不会覆盖已有密码。
+
 ## 开发与质量检查
 
 ```bash
