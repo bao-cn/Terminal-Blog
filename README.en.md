@@ -207,10 +207,10 @@ Article bodies remain exclusively in Markdown. The SQLite `article_index` table 
 The initial configuration lives in `config/site.config.json`. Root can edit the mapped virtual system file:
 
 ```text
-sudo nano ./system/config
+sudo nano config
 ```
 
-`system/config` is not a real file. Reads and writes are mapped to SQLite `system_config`. The configuration controls:
+`config` is not a real file on disk. Its reads and writes are mapped to SQLite `system_config`. The configuration controls:
 
 - Blog name and description
 - `{BlogName}` and `{ArticleName}` title templates
