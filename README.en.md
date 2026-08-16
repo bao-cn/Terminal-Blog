@@ -346,6 +346,19 @@ tests/                    Vitest unit tests
 
 Site configuration is not statically cached by Next.js. Requests read SQLite or the initial JSON and generate an MD5 fingerprint that lets the client detect configuration changes.
 
+## Docker Deployment
+
+The production image uses Next.js standalone output. Set a high-entropy password for the initial root credential, then start the service:
+
+```bash
+export TERMINAL_ROOT_PASSWORD='replace-with-a-random-secret-at-least-16-characters'
+docker compose up --build -d
+```
+
+The service listens on `http://localhost:3000` by default. Set `TERMINAL_BLOG_PORT` to change the host port. Compose uses named volumes for `articles/`, `draft/`, `access/`, and `data/`; removing the container preserves them, while `docker compose down -v` also removes the volumes and their data.
+
+Production deployments should place nginx, Caddy, or another reverse proxy in front of the container for TLS, rate limiting, and malformed or slow connections. `TERMINAL_ROOT_PASSWORD` is used only when the database creates the root credential for the first time; changing it later does not overwrite the stored password.
+
 ## Development and Quality Checks
 
 ```bash
