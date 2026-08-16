@@ -42,7 +42,7 @@ import {
   validateCommandArguments,
   type CommandDefinition,
 } from "@/lib/command-registry";
-import { defaultSiteConfig, type SiteConfig } from "@/lib/site-config";
+import { defaultSiteConfig, formatSiteTitle, type SiteConfig } from "@/lib/site-config";
 import {
   COOKIE_CONSENT_STORAGE_KEY,
   isCookieConsentCancelShortcut,
@@ -320,6 +320,7 @@ export default function TerminalBlog({
   const [themeMode, setThemeMode] = useState<ThemeMode>("auto");
   const [systemTheme, setSystemTheme] = useState<"light" | "dark">("dark");
   const [siteConfig, setSiteConfig] = useState<SiteConfig>(initialConfig);
+  const [activeArticleName, setActiveArticleName] = useState("");
   const [windowFocused, setWindowFocused] = useState(true);
   const [insertMode, setInsertMode] = useState(true);
   const [cursorLeft, setCursorLeft] = useState(0);
@@ -473,6 +474,10 @@ export default function TerminalBlog({
     document.documentElement.style.colorScheme = resolvedTheme;
     document.body.style.background = resolvedTheme === "light" ? "#ffffff" : "#000000";
   }, [language, resolvedTheme]);
+
+  useEffect(() => {
+    document.title = formatSiteTitle(siteConfig, activeArticleName);
+  }, [activeArticleName, siteConfig]);
 
   useEffect(() => {
     if (currentPath !== "/") setExpandedFolder(currentPath);
@@ -824,6 +829,7 @@ export default function TerminalBlog({
     if (command === "clear") {
       setEntries([makeEntry("boot")]);
       setPendingPassword(null);
+      setActiveArticleName("");
       stagedFilesRef.current.clear();
       return;
     }
@@ -950,7 +956,10 @@ export default function TerminalBlog({
               `File not found in this directory: ${articleArgs.join(" ")}`,
             ),
           );
-        else out.push(makeEntry(requestedMode === "source" ? "source" : "article", { article }));
+        else {
+          setActiveArticleName(article.title);
+          out.push(makeEntry(requestedMode === "source" ? "source" : "article", { article }));
+        }
         break;
       }
       case "less": {
@@ -959,6 +968,7 @@ export default function TerminalBlog({
           error(`less: ${args.join(" ")}: file not found`);
           break;
         }
+        setActiveArticleName(article.title);
         openPager({ fileName: `${article.id}.md`, value: articleToBuffer(article) });
         break;
       }
@@ -1638,6 +1648,7 @@ export default function TerminalBlog({
   const clearTerminal = () => {
     setEntries([makeEntry("boot"), ...(cookiePromptPending ? [makeEntry("text", { value: cookieNoticePrompt })] : [])]);
     setPendingPassword(null);
+    setActiveArticleName("");
     stagedFilesRef.current.clear();
   };
 
