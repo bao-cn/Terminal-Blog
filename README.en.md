@@ -234,6 +234,8 @@ The cookie notice uses this structure:
 
 When enabled, a visitor without a stored choice sees the notice at the end of the scrollback on first entry. Enter `y` to accept, or enter `n` / press `Ctrl+C` to decline. The choice is stored in localStorage so later visits do not repeat the prompt. Legacy string values for `cookieNotice` remain readable and are treated as enabled.
 
+The title template drives both server metadata and the browser tab title. Before an article is opened, `{ArticleName}` uses the site `description`; after `cat` or `less` opens an article, it uses that article's title. `{BlogName}` always uses the current blog name.
+
 ## Command System
 
 ### Visitor commands
